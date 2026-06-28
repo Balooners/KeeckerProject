@@ -1,22 +1,101 @@
-# KeeckerProject
+# KeeckerOS
 
-Research project to document and reverse engineer the Keecker robot, including network services, protocols, APIs, firmware, and open-source tooling.
+> **Open Reverse Engineering & Preservation Project for the Keecker K1**
 
-## Current focus
+KeeckerOS is an open-source project dedicated to documenting, understanding and preserving the Keecker K1 robotic platform.
 
-Network cartography of Keecker services exposed on:
+The objective is to build the most complete technical documentation ever produced for the Keecker robot and eventually create an open software platform allowing existing robots to continue operating for many years.
 
-- 5555 ADB
-- 8008 Google Cast / DIAL
-- 8009 Google Cast
-- 8080 Keecker File Uploader
-- 8443 HTTPS
-- 9000 unknown proprietary service
+---
 
-## Modules
+# Objectives
 
-- xplorer/ — automated network exploration framework
-- 
-etwork/ — protocol notes, captures, discoveries
-- everse/ — APK, firmware, protobuf analysis
-- docs/ — final documentation
+* Reverse engineer the Android platform
+* Document the complete software architecture
+* Reverse proprietary APKs and ODEX files
+* Identify Binder services
+* Understand JNI interfaces
+* Document robot hardware
+* Understand navigation, SLAM and perception
+* Document OTA updates
+* Build an open SDK
+* Develop KeeckerOS
+
+---
+
+# Current Status
+
+## Hardware
+
+* Keecker K1
+* Qualcomm Snapdragon 820 (MSM8996)
+* ARM64
+
+## Android
+
+* Android 7.0
+* SDK 24
+* Security Patch 2018-01-05
+
+## Reverse Engineering
+
+✅ USB ADB
+
+✅ Wi-Fi ADB
+
+✅ APK extraction
+
+✅ ODEX extraction
+
+✅ Binder services discovered
+
+✅ AndroidManifest analysed
+
+## Native Platform
+
+Confirmed native technologies:
+
+* ROS
+* OpenCV
+* TensorFlow
+* SLAM
+* Object Detection
+* Native Camera
+* JNI Robot Control
+
+---
+
+# Repository Structure
+
+```text
+docs/
+firmware/
+network/
+reverse/
+scripts/
+sdk/
+tools/
+```
+
+---
+
+# Documentation
+
+Technical documentation is organised by domain.
+
+* Architecture
+* Android
+* Hardware
+* Binder
+* Native Libraries
+* OTA
+* Reverse Engineering
+* Discoveries
+
+Every technical statement is backed by direct evidence (ADB, APK, ODEX, binaries or logs).
+
+---
+
+# Long-Term Vision
+
+KeeckerOS aims to become the reference documentation and development platform for the Keecker K1 while respecting the engineering work of the original Keecker team.

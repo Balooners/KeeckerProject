@@ -254,7 +254,7 @@ Future work
 
 ✓ JavaScript downloader
 
-✓ JavaScript analyzer
+✓ JavaScript analyzera
 
 ✓ JSON reports
 
