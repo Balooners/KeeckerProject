@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.vscode/
+explorer/raw/*
+explorer/reports/*
+network/captures/*
+!explorer/raw/.gitkeep
+!explorer/reports/.gitkeep
+!network/captures/.gitkeep
