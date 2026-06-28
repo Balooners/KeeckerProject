@@ -2,6 +2,7 @@ from pathlib import Path
 
 import httpx
 from bs4 import BeautifulSoup
+from analyzers.javascript import analyze
 
 ENDPOINTS = [
     "/",
@@ -114,5 +115,8 @@ def probe(host: str, port: int):
                         "error": str(ex),
                     }
                 )
+
+    for js in outdir.glob("*.js"):
+        analyze(js)
 
     return results
