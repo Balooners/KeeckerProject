@@ -3,6 +3,7 @@ from pathlib import Path
 import httpx
 from bs4 import BeautifulSoup
 from analyzers.javascript import analyze
+from analyzers.net_report import generate
 
 ENDPOINTS = [
     "/",
@@ -14,6 +15,30 @@ ENDPOINTS = [
     "/config",
     "/version",
     "/health",
+    "/apps",
+    "/apps/",
+    "/apps/YouTube",
+    "/apps/Chrome",
+    "/apps/Backdrop",
+    "/setup/eureka_info",
+    "/setup/eureka_info?options=detail",
+    "/setup/icon",
+    "/ssdp/device-desc.xml",
+    "/device.description.xml",
+    "/setup/icon.png",
+    "/setup/device_info",
+    "/setup/device_info.json",
+    "/setup/deviceinfo",
+    "/setup/scan_results",
+    "/setup/network",
+    "/setup/reboot",
+    "/setup/status",
+    "/setup/config",
+    "/setup/bluetooth",
+    "/setup/wifi",
+    "/ssdp/device-desc.xml",
+    "/description.xml",
+    "/rootDesc.xml",
 ]
 
 
@@ -27,6 +52,22 @@ def download_asset(client, host, port, scheme, asset, outdir):
         url = f"{scheme}://{host}:{port}{asset}"
 
         response = client.get(url)
+        try:
+            options = client.options(url)
+
+            if options.status_code != 404:
+                print(f"      OPTIONS {endpoint} -> {options.status_code}")
+
+                (outdir / f"{filename}_OPTIONS.txt").write_text(
+                    "\n".join(
+                        f"{k}: {v}"
+                        for k, v in options.headers.items()
+                    ),
+                    encoding="utf-8",
+                )
+
+        except Exception:
+            pass
 
         filename = asset.strip("/").replace("/", "_")
 
@@ -69,7 +110,15 @@ def probe(host: str, port: int):
                 if filename == "":
                     filename = "root"
 
-                filename = filename.replace("/", "_")
+                filename = (
+                    filename
+                    .replace("/", "_")
+                    .replace("\\", "_")
+                    .replace("?", "_")
+                    .replace("=", "_")
+                    .replace("&", "_")
+                    .replace(":", "_")
+                )
 
                 (outdir / f"{filename}.txt").write_text(
                     response.text,
@@ -104,6 +153,7 @@ def probe(host: str, port: int):
                         "endpoint": endpoint,
                         "status": response.status_code,
                         "length": len(response.content),
+                        "headers": dict(response.headers),
                     }
                 )
 
@@ -118,5 +168,7 @@ def probe(host: str, port: int):
 
     for js in outdir.glob("*.js"):
         analyze(js)
+
+    generate(port, results)
 
     return results
