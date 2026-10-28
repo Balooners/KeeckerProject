@@ -56,6 +56,18 @@ rea doctor --provider ghidra --json
 
 Result on 2026-10-28: `"healthy": true`. Node, Ghidra 12.1.4, native ARM64 decompiler, JDK 21 and the JADX bridge are all reported healthy. Hopper, IDA and Kuna are absent, which is expected.
 
+## Robot Java code from the ODEX
+
+`firmware/odex/com.keecker.services.odex` (Android 7 OAT container) embeds 3 DEX files (DEX version 037), at offsets
+`0x1cd8`, `0x87cc38` and `0x11a46e0`, for a total of 18,136 class definitions. They are carved from the DEX magic and header
+size with a small script, then their SHA-1 signature and Adler-32 checksum are recomputed: dex2oat modified them in place,
+so the original checksums no longer match. The 3 DEX files and the original `AndroidManifest.xml` are zipped into a local
+APK under `~/keecker-work/odex/` (never in the repository). REA/JADX then loads it: 8,834 top-level classes, including
+`com.keecker.embedded.stm.motorcontrol.HwRobotService`.
+
+Building baksmali/smali from source was refused by the Claude Code permission system (it runs a third-party build script),
+so the carving approach was used instead. Some methods may still contain optimised ("quickened") instructions.
+
 ## Safety note
 
 REA can drive Android devices over adb, including file transfers. Claude Code's `.claude/settings.json` deny rules cover shell commands only, not MCP tools. Keep the robot disconnected from WSL unless a task requires it, and use read-only operations.

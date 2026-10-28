@@ -198,6 +198,13 @@ Recorded on 2026-10-28; product vision and OS target options are in `CLAUDE.md`.
   diagnostics, Alexa/Google Home) and added offline pairing (press the top button 6 times).
 - ✅ SoC ↔ STM link is a UART, `/dev/ttyHSL1`, opened with termios by `libhw_robot_jni.so`. The STM owns propulsion,
   IR proximity sensors, IMU, light sensor, fans, projector focus/tilt and safeties (`docs/07-Hardware/stm32.md`).
+- ✅ Official companion app `com.keecker.remote` 2.0.3 analysed with REA (genuine Keecker signature). Discovery: mDNS
+  `_keecker._tcp`; transport: WebSocket `ws://<host>:<port>/remote/keecker.ws` or Bluetooth RFCOMM
+  `7fdc2820-6bc9-11e3-981f-0800200c9a66`; messages: `remote-api` protobuf over libsodium (`docs/05-Interfaces/remote-app-protocol.md`).
+- ✅ Robot Java code recovered from the ODEX (3 DEX, 18,136 classes) and readable in REA/JADX.
+- ✅ developer.keecker.com is still online (SDK guides, API reference 0.2); a developer USB port exists under the robot.
+- Owner tests (Harold, Android 7 robot): casting unreliable, most TV apps fail except Molotov, "go to the charging
+  station" and Touch Projection do not work, official app pairing works.
 - Details: `docs/07-Hardware/platform.md`, `docs/04-Analysis/FEATURES.md`, `docs/02-Acquisition/Public-Sources.md`.
 
 ## Missions

@@ -1,5 +1,9 @@
 # Index Interfaces
 
+Documents disponibles:
+
+- [remote-app-protocol.md](remote-app-protocol.md) - decouverte mDNS `_keecker._tcp`, WebSocket `/remote/keecker.ws`, Bluetooth RFCOMM, authentification
+
 Documents a creer lorsque le contenu sera disponible:
 
 - `binder-services.md`

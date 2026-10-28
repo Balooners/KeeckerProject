@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-28 — Companion app protocol and robot Java code
+
+### Added
+
+* `docs/05-Interfaces/remote-app-protocol.md`: discovery (`_keecker._tcp`), WebSocket `/remote/keecker.ws`, Bluetooth RFCOMM UUID, authentication, from the official app analysed with REA
+* `docs/10-Operations/Reverse-Environment.md`: method to recover the robot DEX files from the ODEX and load them in REA/JADX
+
 ## 2026-10-28 — OS target decision
 
 ### Changed
