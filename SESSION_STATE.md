@@ -208,6 +208,15 @@ Recorded on 2026-10-28; product vision and OS target options are in `CLAUDE.md`.
 - Owner tests (Harold, Android 7 robot): casting unreliable, most TV apps fail except Molotov, "go to the charging
   station" and Touch Projection do not work, official app pairing works.
 - Details: `docs/07-Hardware/platform.md`, `docs/04-Analysis/FEATURES.md`, `docs/02-Acquisition/Public-Sources.md`.
+- ✅ Robot-side protocol read from the robot code (not obfuscated): Jetty on port 8080 serves the file uploader and
+  `/remote/keecker.ws`, one message per WebSocket frame, `0xAA` keep-alive, `AuthMessage` in clear then crypto_box,
+  pairing rules (known key, setup, 6-press pairing mode, no owner, invitation token), UDP port 43045 (role unknown).
+- ✅ Open test client `scripts/remote-client/keecker_remote.py` (no movement commands); offline self-test passes.
+- 🟡 Earlier ChatGPT sessions recall verified boot "green", which usually means a locked bootloader
+  (`docs/02-Acquisition/Prior-Sessions-Review.md`). To confirm with `scripts/robot-readonly-snapshot.ps1`.
+- `keecker/remote-api` has no license: field numbers are used for interoperability, files are not copied.
+- Harold is contacting Keecker's founder (Pierre Lebeau) on LinkedIn: blessing for the community project, name,
+  bootloader unlock, former engineers. The public README was rewritten for this.
 
 ## Missions
 
@@ -242,5 +251,11 @@ One mission at a time; each ends with SESSION_STATE.md and CHANGELOG.md updates 
 
 ## Immediate next step
 
-Verify on the robot (read-only): SoC variant and device tree model, then analyse `libhw_robot_jni.so` in Ghidra
-to find the link to the motion microcontroller. In parallel, map the `remote-api` protocol to the robot services.
+The robot is away from Harold for several days (from 2026-10-28). When it is back, one home session:
+
+1. `scripts/robot-readonly-snapshot.ps1` (`docs/10-Operations/adb-runbook.md`): bootloader, partitions, kernel, ports, DRM.
+2. `scripts/remote-client/keecker_remote.py` (`docs/10-Operations/remote-client.md`): discovery, 6-press pairing,
+   projector status, LED and tilt.
+
+Until then, without the robot: STM→SoC readings direction in `libhw_robot_jni.so`, role of UDP port 43045,
+and preparation of the LineageOS build (needs Harold's Linux x86_64 machine).

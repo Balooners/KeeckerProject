@@ -49,7 +49,7 @@ install an up-to-date system on their own K1, themselves.
 | Motion controller link | ✅ Documented | Serial link to the STM32: port settings, frame format, command set · [stm32-protocol.md](docs/05-Interfaces/stm32-protocol.md) |
 | Companion app protocol | ✅ Documented | Discovery, WebSocket and Bluetooth transports, pairing handshake, encryption · [remote-app-protocol.md](docs/05-Interfaces/remote-app-protocol.md) |
 | Feature inventory | ✅ First version | Everything the K1 did, and how each feature will come back · [FEATURES.md](docs/04-Analysis/FEATURES.md) |
-| Test client for the protocol | 🔄 In progress | Pair with a robot and drive the projector from a computer |
+| Test client for the protocol | 🔄 Ready, live test pending | Pair with a robot and drive the projector from a computer · [remote-client.md](docs/10-Operations/remote-client.md) |
 | Bootloader and backup | ⏳ Next | Read-only check on a robot, full backup procedure · [adb-runbook.md](docs/10-Operations/adb-runbook.md) |
 | Android TV build | ⏳ Planned | LineageOS on the msm8996 family (same chip as the Xiaomi Mi 5) |
 
@@ -87,9 +87,10 @@ Details: [ROADMAP.md](ROADMAP.md).
 - **Respect for the original work.** The Keecker team built a remarkable product; this project documents it carefully
   and credits it.
 - **No Keecker files are redistributed.** No firmware, application or library from Keecker is published here.
-  Each owner works from what is already on their own robot. Keecker's public SDK and protocol definitions
-  ([`services-api`](https://github.com/keecker/services-api), [`remote-api`](https://github.com/keecker/remote-api),
-  Apache 2.0) are referenced with attribution.
+  Each owner works from what is already on their own robot. Keecker's public repositories are referenced with
+  attribution: the SDK [`services-api`](https://github.com/keecker/services-api) (Apache 2.0) and the protocol
+  definitions [`remote-api`](https://github.com/keecker/remote-api) (published without a license, so read and
+  documented here, not copied).
 - **Privacy and safety.** The robot has cameras and lives in living rooms: no cloud dependency, remote access off by
   default, no default passwords, signed updates. Motion safeties are never disabled.
 - **Evidence over guesswork.** Facts, sources and hypotheses are kept apart.

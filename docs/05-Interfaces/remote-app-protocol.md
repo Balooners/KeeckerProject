@@ -1,6 +1,6 @@
 # Companion App ↔ Robot Protocol
 
-**Status:** In Progress (static analysis of the official app; not yet observed on the network)
+**Status:** In Progress (static analysis of the official app and of the robot server; not yet observed on the network)
 **Last update:** 2026-10-28
 
 ## Objective
@@ -28,6 +28,18 @@ Artifact: official Android companion app (not redistributed).
 
 Commands: `rea inspect-apk-signature`, `rea inspect-android-package`, `rea search-android-classes`, `rea inspect-android-class`, `rea inspect-android-method`, plus a string search on `classes.dex`.
 
+Artifact: robot side, `com.keecker.services` 1.14.6, Java classes recovered from `com.keecker.services.odex`
+(SHA256 `ABA15779A89B2A429D71A541119BD70062FABBFD09233F6274914DD92097FBDC`, method in
+[Reverse-Environment.md](../10-Operations/Reverse-Environment.md)). The robot code is not obfuscated. Classes read:
+`com.keecker.services.remote.httpserver.*` (HTTP and WebSocket server), `com.keecker.services.remote.net.*`
+(connections, handshake), `com.keecker.services.security.SecurityManager` (pairing rules),
+`com.keecker.common.messages.{MessageUtils, ProtobufCommunicationImp}`, `com.keecker.common.utils.{Network, Communication}`,
+`com.keecker.common.utils.nsd.{NsdBroadcaster, Constants}`. Constants were read from the DEX static values
+(`rea inspect-android-class`).
+
+Artifact: network scan of 2026-06-28 (`explorer/reports/NET-8080.json`, `explorer/raw/8080/`): port 8080 serves a page
+titled "Keecker File uploader", Jetty error pages, and static files whose `Last-Modified` date is the server start time.
+
 ## Analysis
 
 ### Connection types
@@ -46,6 +58,8 @@ The app defines four connection types (`com.keecker.common.messages.ConnectionTy
 - The robot advertises a DNS-SD (mDNS) service of type **`_keecker._tcp.`**, found with Android `NsdManager`.
 - The resolved service gives the robot UUID, its name, the host address and the port.
 - An earlier search for "Bluetooth" found no class because the Bluetooth code is obfuscated. It is located through the `android.bluetooth` intents it registers.
+- ✅ Robot side (`NsdBroadcaster`): the service name is the robot name, the port is the HTTP server port, and the TXT
+  record holds `uuid` (robot UUID), `v` (services version code) and `vn` (services version name).
 
 ### Wi-Fi transport ✅
 
@@ -53,6 +67,24 @@ The app defines four connection types (`com.keecker.common.messages.ConnectionTy
 - Connect, read and write timeouts are 10 s. A keep-alive is sent every 5 s, and the connection is considered dead after 10 s without incoming data.
 - Payloads are **binary** WebSocket frames (byte arrays handed to the message layer).
 - The same host also exposes HTTP at `http://<host>:<port>`, probably the file transfer service. Its port comes from the record and is not necessarily the WebSocket port.
+
+### Robot server ✅ Confirmed (robot side)
+
+- One embedded **Jetty** server (`HttpServerService`) serves the file uploader web page, the upload servlet, static
+  directories and every WebSocket endpoint, on a single port (`Network.getHttpPort`).
+- **Port 8080** ✅: the port constant is set at runtime and could not be read statically, but the 2026-06-28 scan found
+  the "Keecker File uploader" page, Jetty error pages and start-time file dates on 8080, which is this server.
+  Clients should still take the port from the mDNS record.
+- A WebSocket connection is not handled by Jetty itself. `WebsocketHandler` opens an Android local (Unix) socket to the
+  remote service, sends the request path and the phone IP, then relays every binary frame both ways. On that internal
+  socket, each message is prefixed by its length in ASCII decimal followed by a `0x00` byte, and `0x03` marks the end of
+  the stream. This internal framing never appears on the network.
+- **Keep-alive**: a binary frame of exactly one byte `0xAA` is echoed back by Jetty and never reaches the service.
+  This is the app's 5-second keep-alive.
+- **Framing on the WebSocket** ✅: one binary frame carries exactly one protocol message (a `KeeckerMessage`, encrypted
+  after the handshake). There is no length prefix.
+- 🟡 A UDP socket manager also starts with the server, on **UDP port 43045** (`Network.UDP_PORT`), and uses the same
+  crypto manager. Its role is not yet read (probably low-latency or streaming data).
 
 ### Bluetooth transport ✅
 
@@ -63,6 +95,43 @@ The app defines four connection types (`com.keecker.common.messages.ConnectionTy
 - Every message is wrapped in `KeeckerMessage { type_name, message bytes }`, where `type_name` is the fully qualified class name of the inner protobuf message.
 - The first exchange is `AuthMessage { key, userId, deviceId, token, errorCode, platform, versionCode }`: the app sends its public key (and optionally an invitation token), the robot answers with its own public key, then all traffic is encrypted.
 - Since the final release, a new phone is authorised by pressing the robot's top button 6 times (offline pairing). Pairing still works with the official app on a recent phone (tested by Harold).
+- ✅ `type_name` is the Java class name of the inner message **without** the `com.keecker.common.messages.` prefix,
+  for example `AuthMessage` or `projection.ProjectorStatusMessage` (`MessageUtils`). `RegisterMessage` and
+  `UnregisterMessage`, on the other hand, carry the **full** class name of the message to subscribe to.
+
+### Handshake ✅ Confirmed (robot side)
+
+From `RemoteCommunicationImp` and `SecurityManager`:
+
+1. The phone sends `AuthMessage` **in clear** (a plain `KeeckerMessage`) with `key` (its raw 32-byte public key) and
+   `deviceId`, both required, plus `userId` (account identifier), optional `token`, `platform` and `versionCode`.
+2. If `versionCode` is not 0, the robot first answers `ServiceVersionMessage` (services version, model `K1`,
+   `forceUpgrade` always false in 1.14.6). Otherwise it assumes protocol v1.
+3. The robot checks the device (rules below). If accepted, it sends `AuthMessage` with its own public key, in clear,
+   and switches the connection to encrypted mode. All later frames, in both directions, are encrypted.
+4. If refused, it sends `AuthMessage` with `errorCode`, waits one second, and closes. The robot also says
+   "unauthorized" aloud.
+
+Pairing rules (`SecurityManager.validateUser`), in order:
+
+| Case | Result |
+|---|---|
+| Public key known, and registered for this `deviceId` | Accepted |
+| Robot in setup state, and `userId` given | ⚠️ All users and keys are deleted, this device becomes the only admin |
+| Pairing mode on (6 presses on the top button; the robot says "pairing"), and `userId` given | Device added as admin, pairing mode off |
+| Robot has no key at all, and `userId` given | Device added as admin |
+| Invitation `token` and `userId` given | Token consumed, device added with the token's level and dates |
+| Otherwise | Refused (`UNKNOWN_USER`, `INCORRECT_PUBLIC_KEY_AND_DEVICE_ID`, …) |
+
+Remote (cloud) connections were limited to admin users. Invitations could have start and end dates.
+
+### Security observations 🟡
+
+- The first exchange is not authenticated: during pairing, a device on the same network could intercept the key
+  exchange. Outside pairing mode, an unknown key is refused. An open client should remember the robot key after the
+  first pairing and alert if it changes (trust on first use).
+- The setup state accepts any device and wipes existing users: our own service should keep pairing tied to a physical
+  action on the robot.
 
 ### Encryption ✅ Confirmed (app side)
 
@@ -84,11 +153,16 @@ An open client needs four pieces, all now identified:
 
 This makes a new companion app possible for current robots, and keeps the same protocol available to the future Android TV build.
 
+A test client implementing all four pieces is in `scripts/remote-client/` ([remote-client.md](../10-Operations/remote-client.md)).
+It passes an offline test against a simulated robot; it has not yet run against a real robot.
+
 ## Open Questions
 
-- [ ] Port number and TXT record fields of `_keecker._tcp` (to observe at home: `avahi-browse -rt _keecker._tcp` or `dns-sd -B _keecker._tcp`).
+- [x] Port number and TXT record fields of `_keecker._tcp`: port 8080, TXT `uuid`, `v`, `vn` (see Robot server). To observe live: `scripts/remote-client` `discover`.
 - [x] libsodium construction, key storage and nonce handling (see Encryption).
-- [ ] Whether `AuthMessage` travels in clear inside a `KeeckerMessage`, and how the robot stores authorised keys.
-- [ ] Framing inside the binary WebSocket frames (raw protobuf, or a length prefix).
-- [ ] Server side: which class in `com.keecker.services` hosts `/remote/keecker.ws`.
+- [x] `AuthMessage` travels in clear inside a `KeeckerMessage`; the robot stores users and keys in its security database (see Handshake).
+- [x] Framing inside the binary WebSocket frames: one message per frame, no length prefix; `0xAA` keep-alive.
+- [x] Server side: Jetty `HttpServerService`, `WebsocketHandler` bridge, `WebSocketServer` and `RemoteCommunicationImp` in the remote service.
+- [ ] First live run of the test client (pairing, projector status, LED).
+- [ ] Role of UDP port 43045.
 - [ ] Role of BLE (advertisement content) and of the Bluetooth RFCOMM link during setup.

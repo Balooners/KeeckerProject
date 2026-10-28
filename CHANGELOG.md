@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-10-28 — Robot-side protocol and open test client
+
+### Added
+
+* `scripts/remote-client/keecker_remote.py`: open client for the companion-app protocol (mDNS discovery, handshake, libsodium encryption, projector status, LED and tilt; no movement commands), with an offline self-test against a simulated robot
+* `docs/10-Operations/remote-client.md`: test procedure for the client
+
+### Changed
+
+* `docs/05-Interfaces/remote-app-protocol.md`: robot-side evidence. Jetty server on port 8080 with a local-socket bridge, one message per WebSocket frame, `0xAA` keep-alive, TXT fields `uuid`/`v`/`vn`, `type_name` format, full handshake, pairing rules, UDP port 43045, security observations
+* `README.md`: `remote-api` is published without a license (read and documented, not copied); only `services-api` is Apache 2.0
+
 ## 2026-10-28 — Public home page and device session kit
 
 ### Added
