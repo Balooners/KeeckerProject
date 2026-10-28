@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — OS target decision
+
+### Changed
+
+* OS target decided by Harold: recent Android TV (LineageOS ATV on msm8996-common, Android 11 first) instead of mainline Linux. `CLAUDE.md` and SESSION_STATE updated.
+
 ## 2026-10-28 — Product understanding and reverse environment
 
 ### Added

@@ -3,6 +3,9 @@
 **Status:** In Progress (first version from public sources)
 **Last update:** 2026-10-28
 
+> **2026-10-28:** the OS target is now a recent Android TV, not Linux (see `CLAUDE.md`). The "KeeckerOS replacement" column
+> still lists Linux-oriented options (ROS 2, Nav2, Waydroid). It will be revised for the Android target.
+
 ## Objective
 
 List everything the Keecker K1 did, where each function ran (robot, Keecker cloud, third party), what survived the end of the company, and the strategy for KeeckerOS.

@@ -168,9 +168,9 @@ Recorded on 2026-10-28; product vision and OS target options are in `CLAUDE.md`.
 
 - Project goal extended: an open-source OS any K1 owner can install without Keecker servers.
   Must work on every unit (hardware revisions, per-robot calibration backup).
-- OS target is an open decision (Harold). Preferred track: mainline Linux + ROS 2 (MSM8996 is supported
-  in mainline via the Dragonboard 820c). Blocking questions: bootloader unlockability, and how
-  `libhw_robot_jni.so` reaches motors and sensors.
+- ✅ OS target decided by Harold on 2026-10-28: **recent Android TV** (LineageOS ATV, msm8996-common, Android 11 first).
+  Reason: the wanted apps (myCANAL, Molotov, Free TV, Jellyfin, IPTV, Netflix, Disney+) and phone casting are Android TV
+  features, and Android 7 (API 24) is below several app minimums. Linux + ROS 2 is no longer the target (see `CLAUDE.md`).
 - ✅ Official Keecker SDK found: https://github.com/keecker/services-api (Apache 2.0, KEECKER SAS,
   last commit March 2019). 36 AIDL files describe Binder contracts (projector, perception, movement
   planner/perception, API service). Reusable with attribution, unlike ODEX and binaries.

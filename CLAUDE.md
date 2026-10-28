@@ -18,26 +18,28 @@ Final goal: an open-source OS that **any Keecker owner can install by themselves
 
 Harold is the decision maker. Anything touching flashing, the installer, security or public releases requires his review.
 
-## OS target — open decision
+## OS target — decided 2026-10-28: recent Android TV
 
-To be decided by Harold once the blocking questions are answered:
+Harold's decision: **a recent Android TV**, not Linux. The owner's needs are Android TV apps (myCANAL, Molotov, Free TV, Jellyfin, IPTV players, Netflix, Disney+) and casting from a phone. The original Android TV 7 (API 24) is already below the minimum of several of these apps.
 
-1. **Mainline Linux + ROS 2** (preferred): LTS kernel, Debian/Ubuntu, Nav2 + slam_toolbox, Waydroid for Android apps.
-2. **Recent Android** (LineageOS, Android 11–13 base, msm8996-common tree).
+- Base: LineageOS Android TV build on the msm8996-common tree. The newest official LineageOS for an msm8996 device is 18.1 (Android 11, Xiaomi Mi 5). First target: Android 11, later 12-13 if feasible. Android 14+ is not realistic on this SoC.
+- Robot functions: our own open Android service that talks to the STM over UART `/dev/ttyHSL1` (see `docs/07-Hardware/stm32.md`), instead of the Keecker platform-signed `com.keecker.services`.
+- Linux (mainline + ROS 2) is no longer the target. It stays documented as a long-term option only.
 
-Blocking questions, highest priority after ODEX reconstruction:
+Blocking questions:
 
-- Is the bootloader unlockable? Read-only check: `ro.boot.flash.locked`, `ro.boot.verifiedbootstate`.
-- How does `libhw_robot_jni.so` talk to motors and sensors (microcontroller over serial/USB, or kernel drivers)?
+- Is the bootloader unlockable? Read-only check: `ro.boot.flash.locked`, `ro.boot.verifiedbootstate`. If not, study the Qualcomm EDL path.
+- Full backup before any write: every partition, especially `persist` (calibration) and the DRM/TrustZone-related partitions.
+- DRM and Cast on a non-certified build: Widevine level kept or not, Google Cast receiver availability.
 
 ## Planned replacements
 
 | Original | Replacement |
 |---|---|
-| Keecker cloud | Local API on the robot + self-hosted remote access (WireGuard / Cloudflare tunnel) + PWA control app; optional Home Assistant integration |
-| Media | Jellyfin / Kodi, AirPlay (UxPlay), DLNA |
-| Remote video / surveillance | Frigate, or Android apps via Waydroid |
-| Netflix / Google Cast | No free solution (DRM). Document it, do not spend time on it |
+| Keecker cloud | Local API on the robot + self-hosted remote access (WireGuard / Tailscale) + companion app (Play Store, under a new name); integration with Harold's home app |
+| Media | Android TV apps from the Play Store (Jellyfin, IPTV players, TV channel apps) |
+| Remote video / surveillance | Our own Android service: camera streaming (WebRTC), patrols, alerts |
+| Netflix / Disney+ / Google Cast | Depends on DRM level and Cast receiver on our build: to test, not guaranteed |
 
 ## Roadmap beyond ROADMAP.md
 
@@ -48,9 +50,11 @@ ROADMAP.md covers repository and reverse engineering phases. Product phases that
 3. Bootloader check + `libhw_robot_jni.so` analysis
 4. `docs/04-Analysis/FEATURES.md`: full feature inventory (feature | source APK/service/.so/model | strategy reuse/reimplement/replace/drop | replacement)
 5. Full partition dump, calibration backup (`persist`), EDL (Qualcomm 9008) recovery path
-6. OS target decision (Harold)
-7. Minimal boot (console, display, Wi-Fi), then motors, camera/SLAM, projector
-8. End-user installer, documentation, public release
+6. OS target decision (Harold): done, recent Android TV
+7. LineageOS Android TV device port (`keecker_k1` on msm8996-common, stock kernel first): boot, projector display, Wi-Fi, audio
+8. Robot service on the new Android: STM UART driver, then navigation, docking, cameras, projector focus/tilt
+9. Companion app, surveillance, voice
+10. End-user installer, documentation, public release
 
 ## Additional rules for Claude Code
 
