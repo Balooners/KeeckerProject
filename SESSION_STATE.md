@@ -212,6 +212,10 @@ Recorded on 2026-10-28; product vision and OS target options are in `CLAUDE.md`.
   `/remote/keecker.ws`, one message per WebSocket frame, `0xAA` keep-alive, `AuthMessage` in clear then crypto_box,
   pairing rules (known key, setup, 6-press pairing mode, no owner, invitation token), UDP port 43045 (role unknown).
 - ✅ Open test client `scripts/remote-client/keecker_remote.py` (no movement commands); offline self-test passes.
+- ✅ STM readings decoded: `libhw_robot_jni.so` receives 7-byte messages (16-bit header, reading ID, 32-bit value) from
+  five abstract sockets `@socket.stm.{status,propulsion,projector,imu,ir}`; it does not read the UART. The program
+  serving them is not in the extracted APKs (🔴 native system daemon, to find on the robot).
+- ✅ UDP 43045 = encrypted real-time channel: pointer, D-pad and manual driving (`MOVE`, linear/angular in −1..1).
 - 🟡 Earlier ChatGPT sessions recall verified boot "green", which usually means a locked bootloader
   (`docs/02-Acquisition/Prior-Sessions-Review.md`). To confirm with `scripts/robot-readonly-snapshot.ps1`.
 - `keecker/remote-api` has no license: field numbers are used for interoperability, files are not copied.
@@ -257,5 +261,5 @@ The robot is away from Harold for several days (from 2026-10-28). When it is bac
 2. `scripts/remote-client/keecker_remote.py` (`docs/10-Operations/remote-client.md`): discovery, 6-press pairing,
    projector status, LED and tilt.
 
-Until then, without the robot: STM→SoC readings direction in `libhw_robot_jni.so`, role of UDP port 43045,
-and preparation of the LineageOS build (needs Harold's Linux x86_64 machine).
+Until then, without the robot: preparation of the LineageOS build (needs Harold's Linux x86_64 machine), and the
+open robot service design (STM driver from `docs/05-Interfaces/stm32-protocol.md`).

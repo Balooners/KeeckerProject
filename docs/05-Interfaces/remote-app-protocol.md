@@ -83,8 +83,29 @@ The app defines four connection types (`com.keecker.common.messages.ConnectionTy
   This is the app's 5-second keep-alive.
 - **Framing on the WebSocket** ✅: one binary frame carries exactly one protocol message (a `KeeckerMessage`, encrypted
   after the handshake). There is no length prefix.
-- 🟡 A UDP socket manager also starts with the server, on **UDP port 43045** (`Network.UDP_PORT`), and uses the same
-  crypto manager. Its role is not yet read (probably low-latency or streaming data).
+### Real-time control over UDP ✅ Confirmed (robot side)
+
+The remote service also listens on **UDP port 43045** (`Network.UDP_PORT`, `UDPSocketManager`), for low-latency
+joystick and pointer input:
+
+- A datagram is accepted only from an IP address that already has an authenticated WebSocket session; it is
+  decrypted with that phone's public key (same crypto manager as the WebSocket).
+- Plain content (`UDPMessage`): 1 command byte, then `x` and `y` as two 64-bit IEEE doubles, big-endian
+  (Java `ByteBuffer` default), 17 bytes. 🟡 The robot decrypts its whole receive buffer (`ENCRYPTED_SIZE`), so a client
+  should send exactly nonce (24) + MAC (16) + 17 = 57 bytes.
+- Commands (IDs from the official app, where the enum initialiser is intact):
+
+| ID | Command | Robot action |
+|---|---|---|
+| 0 | `MOUSE_MOVE` | Move the on-screen pointer by (`x`, `y`) |
+| 1 | `MOUSE_DOWN` | Pointer down |
+| 2 | `MOUSE_CLICK` | Click |
+| 3 | `MOUSE_END_DRAG` | Pointer up |
+| 4 | `MOUSE_SCROLL` | Wheel: `x` = 1 up, 0 down; `y` = amount |
+| 32-39 | `DPAD_UP`, `DPAD_DOWN`, `DPAD_LEFT`, `DPAD_RIGHT`, `DPAD_CENTER`, `DPAD_BACK`, `DPAD_HOME`, `DPAD_PLAY_PAUSE` | Remote-control keys |
+| 48 | `MOVE` | Manual driving: `x` = linear, `y` = angular, each between −1 and 1 (clamped by the movement planner; the official SDK maps 1 to 0.5 m/s and 3 rad/s). `x` = `y` = 0 releases manual control. Any `MOVE` also stops "follow me" |
+
+⚠️ `MOVE` drives the robot. The open test client does not implement it.
 
 ### Bluetooth transport ✅
 
@@ -164,5 +185,5 @@ It passes an offline test against a simulated robot; it has not yet run against 
 - [x] Framing inside the binary WebSocket frames: one message per frame, no length prefix; `0xAA` keep-alive.
 - [x] Server side: Jetty `HttpServerService`, `WebsocketHandler` bridge, `WebSocketServer` and `RemoteCommunicationImp` in the remote service.
 - [ ] First live run of the test client (pairing, projector status, LED).
-- [ ] Role of UDP port 43045.
+- [x] Role of UDP port 43045: encrypted real-time pointer, D-pad and manual driving commands (see Real-time control over UDP).
 - [ ] Role of BLE (advertisement content) and of the Bluetooth RFCOMM link during setup.

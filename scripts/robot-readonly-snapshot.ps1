@@ -10,10 +10,12 @@
 .EXAMPLE
   .\scripts\robot-readonly-snapshot.ps1                   # USB, single device
   .\scripts\robot-readonly-snapshot.ps1 -Serial 192.168.1.50:5555
+  .\scripts\robot-readonly-snapshot.ps1 -Redact           # mask serial numbers, STM id and MAC addresses before sharing
 #>
 # SPDX-License-Identifier: Apache-2.0
 param(
-    [string]$Serial = ''
+    [string]$Serial = '',
+    [switch]$Redact
 )
 
 $ErrorActionPreference = 'Continue'
@@ -60,6 +62,13 @@ Shell 'dev-nodes' 'ls -l /dev/ttyHSL* /dev/ttyHS* /dev/resetboard /dev/video* /d
 Shell 'dev-all' 'ls -l /dev'
 Shell 'su-check' 'which su; ls -l /system/xbin/su /system/bin/su 2>&1; id'
 
+Write-Host 'STM readings path (which program serves @socket.stm.*)'
+Shell 'stm-sockets' 'head -1 /proc/net/unix; grep -iE "stm|keecker" /proc/net/unix'
+Shell 'processes' 'ps; echo ===; ps -A 2>&1'
+Shell 'init-rc' 'grep -rniE "stm|ttyHSL|resetboard|keecker" /init*.rc /system/etc/init /vendor/etc/init 2>/dev/null'
+Shell 'system-bins' 'ls -l /system/bin /system/vendor/bin /vendor/bin 2>/dev/null | grep -iE "stm|keecker|robot|motor"'
+Shell 'stm-uuid' 'ls -l /data/misc/keecker/ 2>&1; cat /data/misc/keecker/stm_uuid 2>&1'
+
 Write-Host 'Network (listening ports of the companion-app server)'
 Shell 'net-tcp' 'cat /proc/net/tcp; cat /proc/net/tcp6'
 Shell 'net-udp' 'cat /proc/net/udp; cat /proc/net/udp6'
@@ -74,6 +83,21 @@ Shell 'drm-dumpsys' 'dumpsys media.drm 2>&1 | head -80'
 Write-Host 'Packages'
 Shell 'packages' 'pm list packages -f -U'
 Shell 'keecker-services-pkg' 'dumpsys package com.keecker.services | head -60'
+
+if ($Redact) {
+    Write-Host 'Redacting serial numbers, STM id and MAC addresses'
+    $props = Get-Content (Join-Path $out 'getprop-all.txt') -Raw
+    $secrets = [regex]::Matches($props, '\[ro\.(?:boot\.)?serialno\]: \[([^\]]+)\]') |
+        ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ } | Sort-Object -Unique
+    "# redacted" | Out-File -Encoding utf8 (Join-Path $out 'stm-uuid.txt')
+    foreach ($file in Get-ChildItem $out -File) {
+        $text = Get-Content $file.FullName -Raw
+        if ($null -eq $text) { continue }
+        foreach ($s in $secrets) { $text = $text.Replace($s, '<serial>') }
+        $text = [regex]::Replace($text, '(?i)\b(?:[0-9a-f]{2}:){5}[0-9a-f]{2}\b', 'xx:xx:xx:xx:xx:xx')
+        Set-Content -Encoding utf8 -NoNewline $file.FullName $text
+    }
+}
 
 Write-Host 'SHA256 manifest'
 Get-ChildItem $out -File | Where-Object Name -ne 'SHA256SUMS.txt' | Get-FileHash -Algorithm SHA256 |

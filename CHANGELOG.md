@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-28 — STM readings and UDP control channel
+
+### Changed
+
+* `docs/05-Interfaces/stm32-protocol.md`: readings direction (7-byte messages from five `@socket.stm.*` abstract sockets, 39-entry ID table, decoding of every reading, IMU packing), start-up sequence, command `0x01` = safeties (`0x3F00`), `0x07` = focus and `0x08` = tilt calibration
+* `docs/05-Interfaces/remote-app-protocol.md`: UDP port 43045 = encrypted real-time pointer, D-pad and manual driving commands, datagram layout and command IDs
+* `docs/07-Hardware/stm32.md`: readings question answered, socket server still to identify
+* `scripts/robot-readonly-snapshot.ps1`: STM socket server discovery (`/proc/net/unix`, processes, init files), `-Redact` option for community sharing
+
 ## 2026-10-28 — License
 
 ### Changed

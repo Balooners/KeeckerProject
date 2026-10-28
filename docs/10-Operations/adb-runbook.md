@@ -13,6 +13,7 @@ Answer the open device questions in one session at the robot, without changing a
 4. Presence of `/dev/ttyHSL1` and `/dev/resetboard` (STM link).
 5. Listening ports, including the companion-app WebSocket.
 6. DRM (Widevine) libraries and Cast-related properties.
+7. The program that serves the `@socket.stm.*` readings sockets ([stm32-protocol.md](../05-Interfaces/stm32-protocol.md)).
 
 What was already observed or only remembered from earlier sessions is listed in
 [Prior-Sessions-Review.md](../02-Acquisition/Prior-Sessions-Review.md).
@@ -51,6 +52,9 @@ EDL (Qualcomm 9008), partition dumps, toggling "OEM unlocking".
 
    Output: `firmware/captures/<timestamp>/` (git-ignored), one `.txt` file per command and a `SHA256SUMS.txt`.
    The bootloader summary is printed at the end.
+
+   Owners who share their capture with the community add `-Redact`: serial numbers, the STM identifier and MAC
+   addresses are masked before the hashes are computed.
 
 3. Look, without touching: Settings → Developer options → is there an **"OEM unlocking"** switch, and is it greyed
    out? Take a photo of the screen. Do not toggle it.

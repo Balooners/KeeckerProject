@@ -57,7 +57,7 @@ The robot hardware behind the STM is reachable through one serial port, with no 
 ## Open Questions
 
 - [x] Baud rate, termios settings, command frame format and command IDs: see [stm32-protocol.md](../05-Interfaces/stm32-protocol.md).
-- [ ] Reading frames sent back by the STM.
+- [x] Readings sent back by the STM: the library receives them as 7-byte messages from five `@socket.stm.*` sockets, not from the UART directly (see [stm32-protocol.md](../05-Interfaces/stm32-protocol.md)). The program serving those sockets is still to identify on the robot.
 - [x] `/dev/resetboard` is the STM reset GPIO (`1` written, 100 ms wait). Kernel driver still unknown.
 - [ ] Which UART of the Open-Q 820 `ttyHSL1` maps to, for the future Linux device tree.
 - [ ] STM firmware version (`DispatchRevision`) and whether firmware updates went through `com.keecker.services.ota`.
