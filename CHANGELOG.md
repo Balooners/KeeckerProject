@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-10-28 — Public home page and device session kit
+
+### Added
+
+* `docs/10-Operations/adb-runbook.md` and `scripts/robot-readonly-snapshot.ps1`: one read-only ADB session that answers the bootloader, partition, kernel, STM node, port and DRM questions
+* `docs/02-Acquisition/Prior-Sessions-Review.md`: review of the earlier ADB and network sessions (observed, assumed, unknown)
+* `docs/assets/banner.svg`: project banner (original artwork, no Keecker logo or photo)
+
+### Changed
+
+* `README.md` rewritten as the public home page: community and non-commercial purpose, Android TV target, progress, architecture diagram, roadmap, principles, non-affiliation notice
+
 ## 2026-10-28 — Companion app protocol and robot Java code
 
 ### Added

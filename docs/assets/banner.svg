@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="360" viewBox="0 0 1280 360" role="img" aria-labelledby="t d">
+  <title id="t">KeeckerOS</title>
+  <desc id="d">A community effort to keep the Keecker K1 alive</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1426"/>
+      <stop offset="0.55" stop-color="#11284a"/>
+      <stop offset="1" stop-color="#0d4a5c"/>
+    </linearGradient>
+    <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4f7fb"/>
+      <stop offset="1" stop-color="#c9d4e2"/>
+    </linearGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5fd4e8" stop-opacity="0.55"/>
+      <stop offset="1" stop-color="#5fd4e8" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#5fd4e8" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#5fd4e8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1280" height="360" fill="url(#bg)"/>
+  <g stroke="#ffffff" stroke-opacity="0.05">
+    <path d="M0 90H1280M0 180H1280M0 270H1280"/>
+    <path d="M160 0V360M320 0V360M480 0V360M640 0V360M800 0V360M960 0V360M1120 0V360"/>
+  </g>
+
+  <!-- Stylised home robot: rounded body, projector lens, light beam -->
+  <circle cx="1010" cy="190" r="150" fill="url(#glow)"/>
+  <path d="M1010 120 L1240 60 L1240 210 Z" fill="url(#beam)"/>
+  <rect x="930" y="110" width="160" height="190" rx="78" fill="url(#body)"/>
+  <ellipse cx="1010" cy="300" rx="86" ry="12" fill="#000" fill-opacity="0.25"/>
+  <circle cx="1010" cy="150" r="22" fill="#0b1426"/>
+  <circle cx="1010" cy="150" r="12" fill="#5fd4e8"/>
+  <circle cx="1004" cy="144" r="4" fill="#ffffff" fill-opacity="0.8"/>
+  <rect x="975" y="205" width="70" height="6" rx="3" fill="#0b1426" fill-opacity="0.25"/>
+
+  <text x="96" y="160" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="78" font-weight="700" fill="#ffffff" letter-spacing="1">KeeckerOS</text>
+  <text x="100" y="212" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="28" fill="#cfe3f1">A community effort to keep the Keecker K1 alive</text>
+  <text x="100" y="262" font-family="Segoe UI, Helvetica Neue, Arial, sans-serif" font-size="20" fill="#5fd4e8" letter-spacing="2">FREE · OPEN SOURCE · NON-COMMERCIAL · LOCAL-FIRST</text>
+</svg>
