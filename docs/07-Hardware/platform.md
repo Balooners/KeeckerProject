@@ -23,7 +23,7 @@ Abbreviations used below: "Support guide" is the official 85-page Support Q&A (2
 | Dimensions | 38.8 cm high, 37.8 cm wide, 39.7 cm long | Specs | ✅ Confirmed |
 | Weight | 9.4 kg with battery | Specs | ✅ Confirmed |
 | Design / assembly | Designed in Paris, assembled in China | Support guide | ✅ Confirmed |
-| External ports | None (no USB, no HDMI). Wi-Fi and Bluetooth only | Support guide | ✅ Confirmed |
+| External ports | No user-facing ports according to the Support guide. A **developer USB port** exists under the robot, at the back (used for ADB). The repository's ADB-over-USB acquisition is consistent with it | Support guide; developer.keecker.com guide | ✅ Confirmed |
 
 ### Compute module
 

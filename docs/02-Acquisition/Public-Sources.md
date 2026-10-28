@@ -25,6 +25,14 @@ List the public, non-device sources used to understand the Keecker K1 as a produ
 
 Other `keecker` GitHub repositories (`ParallaxHeader`, `XLPagerTabStrip`) are mobile UI libraries unrelated to the robot.
 
+## developer.keecker.com (live on 2026-10-28)
+
+Official developer portal, still online (HTTP 200 on 2026-10-28). Archived since 2017 on the Wayback Machine.
+
+- Overview: the Keecker Android SDK gives apps access to the front and 360° cameras, the depth camera and proximity sensors, movement commands, map location, and wall and charging station detection. Apps can be distributed to Keecker owners through Google Play. It also mentions two other developer options: **Blockly** (automation) and a **ROS application** (robot algorithm prototyping).
+- Guide "Creating a Keecker app": Android TV app, dependency `com.github.keecker:services-api:0.2.0-alpha` from JitPack, permission `com.keecker.permission.PROJECTION`, `ProjectorClient.setState(ProjectorState(orientation = 0 | 90))`. Development is done through **a USB port located under the robot, at the back**, with an on-screen confirmation.
+- Reference 0.2 (Dokka): packages `com.keecker.hardware.robot.interfaces`, `com.keecker.services.interfaces`, `com.keecker.services.navigation.interfaces` (odometry, compass, align-to-wall, go-to-charging-station status `STARTED / DOCKING / DOCKED / FAILED`, kidnapping status, detection results).
+
 ## keecker.com (Internet Archive)
 
 | Document | Original URL | Snapshot | SHA256 of local copy |
