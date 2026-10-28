@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-28 — License
+
+### Changed
+
+* License decided by Harold: **Apache License 2.0** (official text from apache.org, SHA256 `cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30`). `NOTICE` added: the license covers the original work in this repository, not Keecker material, which is never redistributed. README badge and section, ROADMAP, SPDX headers on scripts
+
 ## 2026-10-28 — Robot-side protocol and open test client
 
 ### Added

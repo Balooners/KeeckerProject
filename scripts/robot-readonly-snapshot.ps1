@@ -11,6 +11,7 @@
   .\scripts\robot-readonly-snapshot.ps1                   # USB, single device
   .\scripts\robot-readonly-snapshot.ps1 -Serial 192.168.1.50:5555
 #>
+# SPDX-License-Identifier: Apache-2.0
 param(
     [string]$Serial = ''
 )

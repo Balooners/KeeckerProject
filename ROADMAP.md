@@ -30,6 +30,6 @@
 
 ## Phase 4 - Public Project Readiness
 
-- Select final license.
+- Final license selected: Apache 2.0 (2026-10-28).
 - Decide artifact redistribution policy.
 - Add CI, documentation checks, issue templates, and release process.

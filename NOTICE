@@ -1,0 +1,20 @@
+KeeckerOS
+Copyright 2026 Harold Estassy and the KeeckerOS contributors
+
+Licensed under the Apache License, Version 2.0 (see LICENSE).
+
+KeeckerOS is an independent, non-commercial community project. It is not
+affiliated with, endorsed by or sponsored by Keecker SAS. "Keecker" is a
+trademark of its owner and is used here only to describe the hardware this
+project supports. "KeeckerOS" is a working name.
+
+The license covers the original work published in this repository:
+documentation, scripts, tools and artwork. It does not cover, and this
+repository does not contain, Keecker firmware, applications, libraries,
+models or other proprietary material. Such material stays on each owner's
+own robot and is never redistributed here.
+
+Third-party references:
+- keecker/services-api, Copyright 2012-2018 KEECKER SAS, Apache License 2.0.
+- keecker/remote-api, published by Keecker without a license: read and
+  documented for interoperability only, no file copied.

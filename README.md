@@ -6,7 +6,7 @@
   <img alt="Status" src="https://img.shields.io/badge/status-research%20%26%20documentation-0d4a5c">
   <img alt="Target" src="https://img.shields.io/badge/target-Android%20TV%2011%20(LineageOS)-11284a">
   <img alt="Non-commercial" src="https://img.shields.io/badge/project-community%20%C2%B7%20non--commercial-5fd4e8">
-  <img alt="License" src="https://img.shields.io/badge/license-to%20be%20decided-lightgrey">
+  <a href="LICENSE"><img alt="License: Apache 2.0" src="https://img.shields.io/badge/license-Apache%202.0-blue"></a>
 </p>
 
 <p align="center">
@@ -111,6 +111,10 @@ Start with [docs/INDEX.md](docs/INDEX.md), then [System-Architecture.md](docs/01
 
 You own a K1, worked on it, or simply want to help? Contributions, test reports and memories of how the robot
 worked are all welcome. See [CONTRIBUTING.md](CONTRIBUTING.md). Security findings: [SECURITY.md](SECURITY.md).
+
+## License
+
+[Apache License 2.0](LICENSE). The license covers the original work in this repository; see [NOTICE](NOTICE).
 
 ---
 

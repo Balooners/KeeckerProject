@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: Apache-2.0
 """Minimal open client for the Keecker K1 companion-app protocol.
 
 Protocol reference: docs/05-Interfaces/remote-app-protocol.md
