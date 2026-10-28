@@ -60,9 +60,18 @@ The app defines four connection types (`com.keecker.common.messages.ConnectionTy
 
 ### Message layer (from `keecker/remote-api`)
 
-- Every message is wrapped in `KeeckerMessage { type_name, message bytes }`, then encrypted into an `EncryptedKeeckerMessage` with a nonce.
-- The first exchange is `AuthMessage`: the app sends its public key (and optionally an invitation token), the robot answers with its own public key, then all traffic is encrypted (libsodium, public-key cryptography).
+- Every message is wrapped in `KeeckerMessage { type_name, message bytes }`, where `type_name` is the fully qualified class name of the inner protobuf message.
+- The first exchange is `AuthMessage { key, userId, deviceId, token, errorCode, platform, versionCode }`: the app sends its public key (and optionally an invitation token), the robot answers with its own public key, then all traffic is encrypted.
 - Since the final release, a new phone is authorised by pressing the robot's top button 6 times (offline pairing). Pairing still works with the official app on a recent phone (tested by Harold).
+
+### Encryption ✅ Confirmed (app side)
+
+From the app classes in `com.keecker.common.messages.crypto` and the bundled libsodium-jni wrapper:
+
+- **Keys**: each side has a 32-byte public key and a 32-byte secret key (libsodium `crypto_box` key pair). The app stores its own pair in the `KEYSTORE` shared preferences, under `PUB_KEY` and `PRIV_KEY`. Keys are serialised as Base64, URL-safe alphabet, without padding or line wraps.
+- **Encrypted frame**: `nonce (24 random bytes) || box`, where `box` is the libsodium public-key authenticated encryption of the plaintext with the peer's public key and the sender's secret key. The box keeps the 16-byte authenticator and drops the 16 zero bytes of the classic NaCl output: the same layout as `crypto_box_easy`.
+- 🟡 Primitive: Curve25519-XSalsa20-Poly1305 (`crypto_box`), inferred from the wrapper's 32/24/32/16 byte constants. The exact native function name is still to be confirmed.
+- **Layering**: an "encrypted connection" wraps the transport (WebSocket or Bluetooth). It encrypts every outgoing byte array and decrypts every incoming one, dropping frames that fail authentication.
 
 ## Conclusions
 
@@ -78,7 +87,8 @@ This makes a new companion app possible for current robots, and keeps the same p
 ## Open Questions
 
 - [ ] Port number and TXT record fields of `_keecker._tcp` (to observe at home: `avahi-browse -rt _keecker._tcp` or `dns-sd -B _keecker._tcp`).
-- [ ] Exact libsodium construction (box, secretstream…), key storage and nonce handling: next classes to analyse.
+- [x] libsodium construction, key storage and nonce handling (see Encryption).
+- [ ] Whether `AuthMessage` travels in clear inside a `KeeckerMessage`, and how the robot stores authorised keys.
 - [ ] Framing inside the binary WebSocket frames (raw protobuf, or a length prefix).
 - [ ] Server side: which class in `com.keecker.services` hosts `/remote/keecker.ws`.
 - [ ] Role of BLE (advertisement content) and of the Bluetooth RFCOMM link during setup.
