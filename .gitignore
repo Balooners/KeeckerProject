@@ -10,14 +10,22 @@ network/captures/*
 !explorer/reports/.gitkeep
 !network/captures/.gitkeep
 
-# Proprietary extracted artifacts
-firmware/apk/*.apk
-firmware/odex/*.odex
-firmware/oat/*.oat
+# Proprietary extracted artifacts - never publish.
+# Everything under firmware/ is ignored except documentation files.
+firmware/**
+!firmware/**/
+!firmware/**/*.md
 
-
-# Local proprietary artifacts - do not publish
-firmware/apk/*.apk
-firmware/odex/*.odex
-firmware/oat/*.oat
-
+# Reverse engineering work outputs
+work/
+framework/
+*.apk
+*.odex
+*.oat
+*.vdex
+*.dex
+*.smali
+*.so
+*.img
+*.pb
+*.tflite

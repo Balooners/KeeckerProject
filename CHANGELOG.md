@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-10-28 — Mission 0: Repository hygiene
+
+### Added
+
+* `CLAUDE.md`: product vision, OS target options and working rules for Claude Code (imports `AGENTS.md` and `SESSION_STATE.md`)
+* `.claude/settings.json`: hard deny rules for `adb reboot/root/remount/install/uninstall/push/sideload`, `adb shell su` and `fastboot`
+* SESSION_STATE: decisions since 2026-06-28 (official `keecker/services-api` SDK, OS target track, tooling) and mission plan
+
+### Changed
+
+* `.gitignore`: everything under `firmware/` is ignored except `*.md`; work outputs (`work/`, `framework/`) and proprietary formats (`*.apk`, `*.odex`, `*.oat`, `*.vdex`, `*.dex`, `*.smali`, `*.so`, `*.img`, `*.pb`, `*.tflite`) are ignored repository-wide
+* ODEX recovery method corrected: baksmali/smali on the OAT container; vdexExtractor does not apply to Android 7
+
+### Removed
+
+* Local history: unreachable commit `bf8b007`, which contained proprietary binaries, purged from the local object store (no branch or tag referenced it; the GitHub API returns "No commit found" for its SHA, so it was never published)
+
+
 ## 2026-06-28 — Phase II: ADB Exploration
 
 ### Added

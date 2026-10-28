@@ -1,6 +1,6 @@
 # SESSION_STATE.md
 
-Last update: 2026-06-28
+Last update: 2026-10-28
 
 ## Current phase
 
@@ -138,7 +138,11 @@ Format:
 
 - JADX cannot directly decompile `com.keecker.services.odex`.
 - Need Android 7 ODEX/OAT reconstruction workflow.
-- Need tools such as oat2dex / baksmali / vdexExtractor / JADX fallback workflow.
+- Method corrected on 2026-10-28: on Android 7 the ODEX is an OAT container that embeds the DEX.
+  vdexExtractor does not apply (VDEX only exists from Android 8). Planned chain:
+  `baksmali list dex` → `baksmali x -d <bootclasspath>` → `smali a` → JADX/REA, all inside `work/` (git-ignored).
+  If `firmware/oat/boot.oat` alone is an incomplete bootclasspath, a read-only `adb pull /system/framework`
+  will be needed (robot + Harold's approval).
 
 ## Next objective
 
@@ -157,6 +161,43 @@ Then search for:
 - JNI bindings
 - System.loadLibrary usage
 - Native method declarations
+
+## Decisions and findings since 2026-06-28
+
+Recorded on 2026-10-28; product vision and OS target options are in `CLAUDE.md`.
+
+- Project goal extended: an open-source OS any K1 owner can install without Keecker servers.
+  Must work on every unit (hardware revisions, per-robot calibration backup).
+- OS target is an open decision (Harold). Preferred track: mainline Linux + ROS 2 (MSM8996 is supported
+  in mainline via the Dragonboard 820c). Blocking questions: bootloader unlockability, and how
+  `libhw_robot_jni.so` reaches motors and sensors.
+- ✅ Official Keecker SDK found: https://github.com/keecker/services-api (Apache 2.0, KEECKER SAS,
+  last commit March 2019). 36 AIDL files describe Binder contracts (projector, perception, movement
+  planner/perception, API service). Reusable with attribution, unlike ODEX and binaries.
+  - 🟡 Probable: an STM32 microcontroller handles at least the movement safeties
+    (`embedded/stm`, `MovementSafetiesStatus`, 12 proximity sensors).
+  - 🔴 Hypothesis: motors and sensors go through a serial or USB link to that MCU.
+  - Consequence: ODEX reconstruction becomes verification for SDK-covered services; services without
+    public AIDL (HwRobotService, SlamService, ZcamService, FollowMeService, CameraService, RemoteService)
+    become priority targets. To be confirmed by mission 1.
+- Tooling decided: REA MCP (official `morluto/rea` only) and Ghidra (official NSA repository), both in WSL2
+  (Harold's workstation is Windows 11 ARM64).
+- Legal rule restated: nothing proprietary in the repository; proprietary parts will be extracted from each
+  owner's robot by a script. The "Keecker OS" name is provisional.
+
+## Missions
+
+One mission at a time; each ends with SESSION_STATE.md and CHANGELOG.md updates and Harold's validation.
+
+| # | Mission | Robot needed | Status |
+|---|---|---|---|
+| 0 | Repository hygiene: `.gitignore`, `CLAUDE.md`, Claude Code deny rules | No | Done 2026-10-28, awaiting validation |
+| 1 | `services-api` SDK mapping: `docs/05-Interfaces/Services-API.md`, AIDL → services, services without AIDL, `embedded/stm`, ROS 2 mapping, other public Keecker repositories | No | Next |
+| 2 | Reverse environment: REA + Ghidra in WSL2 | No | |
+| 3 | DEX recovery from the ODEX, Java analysis of priority services | No (unless bootclasspath is missing) | |
+| 4 | Read-only bootloader check + `libhw_robot_jni.so` analysis | Yes, read-only | |
+| 5 | `docs/04-Analysis/FEATURES.md` | No | |
+| 6 | Full partition dump, `persist` backup, EDL (Qualcomm 9008) study | Yes, procedure validated by Harold first | |
 
 ## Do not repeat
 
@@ -177,4 +218,4 @@ Then search for:
 
 ## Immediate next step
 
-Set up the ODEX reconstruction toolchain and recover DEX/classes from the Android 7 ARM64 ODEX.
+Mission 1: map the official `services-api` SDK (see Missions). ODEX reconstruction follows in mission 3.
