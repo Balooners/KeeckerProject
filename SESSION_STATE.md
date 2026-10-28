@@ -201,6 +201,8 @@ Recorded on 2026-10-28; product vision and OS target options are in `CLAUDE.md`.
 - ✅ Official companion app `com.keecker.remote` 2.0.3 analysed with REA (genuine Keecker signature). Discovery: mDNS
   `_keecker._tcp`; transport: WebSocket `ws://<host>:<port>/remote/keecker.ws` or Bluetooth RFCOMM
   `7fdc2820-6bc9-11e3-981f-0800200c9a66`; messages: `remote-api` protobuf over libsodium (`docs/05-Interfaces/remote-app-protocol.md`).
+- ✅ STM command protocol decoded: `/dev/ttyHSL1` 115200 8N1, 7-byte frames `0xBE, cmd, 4-byte value (MSB first), XOR`;
+  velocity `0x02`, focus `0x03`, tilt `0x04`, fans `0x09`, PWM `0x17`, PIDs, wheels `0x31` (`docs/05-Interfaces/stm32-protocol.md`).
 - ✅ Robot Java code recovered from the ODEX (3 DEX, 18,136 classes) and readable in REA/JADX.
 - ✅ developer.keecker.com is still online (SDK guides, API reference 0.2); a developer USB port exists under the robot.
 - Owner tests (Harold, Android 7 robot): casting unreliable, most TV apps fail except Molotov, "go to the charging

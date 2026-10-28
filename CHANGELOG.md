@@ -4,6 +4,7 @@
 
 ### Added
 
+* `docs/05-Interfaces/stm32-protocol.md`: STM UART settings, reset sequence, 7-byte command frame and command IDs
 * `docs/05-Interfaces/remote-app-protocol.md`: discovery (`_keecker._tcp`), WebSocket `/remote/keecker.ws`, Bluetooth RFCOMM UUID, authentication, from the official app analysed with REA
 * `docs/10-Operations/Reverse-Environment.md`: method to recover the robot DEX files from the ODEX and load them in REA/JADX
 
