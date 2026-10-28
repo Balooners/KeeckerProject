@@ -1,5 +1,9 @@
 # Index Analysis
 
+Documents disponibles:
+
+- [FEATURES.md](FEATURES.md) - inventaire des fonctions du K1 et strategie KeeckerOS
+
 Documents a creer lorsque le contenu sera disponible:
 
 - `android-manifest-analysis.md`

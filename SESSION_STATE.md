@@ -185,18 +185,31 @@ Recorded on 2026-10-28; product vision and OS target options are in `CLAUDE.md`.
 - Legal rule restated: nothing proprietary in the repository; proprietary parts will be extracted from each
   owner's robot by a script. The "Keecker OS" name is provisional.
 
+### Product understanding (2026-10-28, public sources)
+
+- ✅ Compute module is a commercial Intrinsyc **Open-Q 820** SOM (official certification text: "Radio Module: ITCNFA324
+  Integrated on Open Q-820"). 🟡 SoC probably APQ8096, same as the DragonBoard 820c (mainline Linux).
+- ✅ A dedicated microcontroller executes motion commands and reads the 12 proximity sensors in real time
+  (Keecker navigation blog post; SDK `NB_OF_PROXIMITY_SENSORS = 12`).
+- ✅ Sensors: forward ToF depth camera, 12 proximity sensors, wheel magnetic encoders, IMU, 13 MP 360° fisheye top camera,
+  5 MP front camera, temperature/humidity/light, 2 microphones.
+- ✅ `keecker/remote-api` holds the full companion-app protocol (~180 protobuf messages).
+- ✅ End of life: the final release removed every server-backed feature (remote camera, programs, analytics, video call,
+  diagnostics, Alexa/Google Home) and added offline pairing (press the top button 6 times).
+- Details: `docs/07-Hardware/platform.md`, `docs/04-Analysis/FEATURES.md`, `docs/02-Acquisition/Public-Sources.md`.
+
 ## Missions
 
 One mission at a time; each ends with SESSION_STATE.md and CHANGELOG.md updates and Harold's validation.
 
 | # | Mission | Robot needed | Status |
 |---|---|---|---|
-| 0 | Repository hygiene: `.gitignore`, `CLAUDE.md`, Claude Code deny rules | No | Done 2026-10-28, awaiting validation |
-| 1 | `services-api` SDK mapping: `docs/05-Interfaces/Services-API.md`, AIDL → services, services without AIDL, `embedded/stm`, ROS 2 mapping, other public Keecker repositories | No | Next |
-| 2 | Reverse environment: REA + Ghidra in WSL2 | No | |
+| 0 | Repository hygiene: `.gitignore`, `CLAUDE.md`, Claude Code deny rules | No | Done 2026-10-28 |
+| 1 | `services-api` SDK mapping: `docs/05-Interfaces/Services-API.md`, AIDL → services, services without AIDL, `embedded/stm`, ROS 2 mapping, other public Keecker repositories | No | Started: public repositories reviewed (see `docs/02-Acquisition/Public-Sources.md`) |
+| 2 | Reverse environment: REA + Ghidra in WSL2 | No | Done 2026-10-28 (`docs/10-Operations/Reverse-Environment.md`) |
 | 3 | DEX recovery from the ODEX, Java analysis of priority services | No (unless bootclasspath is missing) | |
 | 4 | Read-only bootloader check + `libhw_robot_jni.so` analysis | Yes, read-only | |
-| 5 | `docs/04-Analysis/FEATURES.md` | No | |
+| 5 | `docs/04-Analysis/FEATURES.md` | No | First version 2026-10-28 from public sources |
 | 6 | Full partition dump, `persist` backup, EDL (Qualcomm 9008) study | Yes, procedure validated by Harold first | |
 
 ## Do not repeat
@@ -218,4 +231,5 @@ One mission at a time; each ends with SESSION_STATE.md and CHANGELOG.md updates 
 
 ## Immediate next step
 
-Mission 1: map the official `services-api` SDK (see Missions). ODEX reconstruction follows in mission 3.
+Verify on the robot (read-only): SoC variant and device tree model, then analyse `libhw_robot_jni.so` in Ghidra
+to find the link to the motion microcontroller. In parallel, map the `remote-api` protocol to the robot services.
