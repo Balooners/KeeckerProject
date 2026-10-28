@@ -7,6 +7,7 @@
 * `docs/02-Acquisition/Public-Sources.md`: public Keecker repositories, archived keecker.com documents, end-of-life documents, with SHA256 of local copies (not redistributed)
 * `docs/07-Hardware/platform.md`: K1 hardware overview (Open-Q 820 module, motion microcontroller, sensors, projector, power)
 * `docs/04-Analysis/FEATURES.md`: feature inventory with cloud dependency, end-of-life status and KeeckerOS strategy
+* `docs/07-Hardware/stm32.md`: SoC to STM link identified as UART `/dev/ttyHSL1`, with the list of functions owned by the STM
 * `docs/10-Operations/Reverse-Environment.md`: REA 6.8.0, Ghidra 12.1.4 (ARM64 decompiler built locally), JADX bridge in WSL2
 
 ## 2026-10-28 — Mission 0: Repository hygiene

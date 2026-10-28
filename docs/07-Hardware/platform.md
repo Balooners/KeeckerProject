@@ -51,8 +51,8 @@ The Open-Q 820 is a commercial module, not a Keecker design. Intrinsyc (now Lant
 | Obstacles crossed | Up to about 2 cm (door steps, cables, carpets) | Support guide | ✅ Confirmed |
 | Cliff detection | Stops in front of holes and stairs | Support guide | ✅ Confirmed |
 | Motion microcontroller | A dedicated microcontroller executes the motion commands and reads the proximity sensors in real time, independently of the main processor | Nav blog | ✅ Confirmed |
-| MCU family | STM32. The SDK package that carries the safety status is named `embedded/stm` | SDK | 🟡 Probable |
-| Link between SoC and MCU | Unknown (UART, USB or SPI) | - | 🔴 Hypothesis: serial link |
+| MCU family | STM (Java package `com.keecker.embedded.stm`, method names `toggleSTMSafeties`, `DispatchSTMTemperature`); exact part number unknown | SDK; `libhw_robot_jni.so` | ✅ Confirmed (STM), part number open |
+| Link between SoC and MCU | UART `/dev/ttyHSL1` (termios), see [stm32.md](stm32.md) | `libhw_robot_jni.so` static analysis | ✅ Confirmed |
 
 ### Perception sensors
 
@@ -111,8 +111,8 @@ All values ✅ Confirmed from official documents.
 ## Open Questions
 
 - [ ] Exact SoC variant (APQ8096 or MSM8996) and device tree `model` / `compatible` on the robot.
-- [ ] Physical link to the motion MCU (`/dev/ttyHS*`, `/dev/ttyACM*`, SPI): first target of the `libhw_robot_jni.so` analysis.
+- [x] Physical link to the motion MCU: UART `/dev/ttyHSL1` ([stm32.md](stm32.md)). Frame format still to decode.
 - [ ] Depth camera model and interface (USB or MIPI CSI). `libzcam*` / `ZcamService` are candidates.
-- [ ] Projector control path (focus, tilt, keystone, LED driver).
+- [ ] Projector control path: focus and tilt motors are driven by the STM ([stm32.md](stm32.md)); keystone and LED driver still unknown.
 - [ ] FCC ID on the regulatory label, and whether an FCC filing with internal photos exists.
 - [ ] Hardware revisions across units (the docking station was redesigned: the Support guide mentions a "new charging station").

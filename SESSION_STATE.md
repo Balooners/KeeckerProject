@@ -196,6 +196,8 @@ Recorded on 2026-10-28; product vision and OS target options are in `CLAUDE.md`.
 - ✅ `keecker/remote-api` holds the full companion-app protocol (~180 protobuf messages).
 - ✅ End of life: the final release removed every server-backed feature (remote camera, programs, analytics, video call,
   diagnostics, Alexa/Google Home) and added offline pairing (press the top button 6 times).
+- ✅ SoC ↔ STM link is a UART, `/dev/ttyHSL1`, opened with termios by `libhw_robot_jni.so`. The STM owns propulsion,
+  IR proximity sensors, IMU, light sensor, fans, projector focus/tilt and safeties (`docs/07-Hardware/stm32.md`).
 - Details: `docs/07-Hardware/platform.md`, `docs/04-Analysis/FEATURES.md`, `docs/02-Acquisition/Public-Sources.md`.
 
 ## Missions
