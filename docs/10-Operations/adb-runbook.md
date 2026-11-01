@@ -96,7 +96,14 @@ Not readable as `shell`: `/proc/cmdline`, `/proc/device-tree`, `/data/misc/keeck
 Goal: confirm the bootloader lock state and read the partition list. It needs a reboot into the bootloader, so it is
 run by Harold himself (the project's Claude Code deny rules block `adb reboot` and `fastboot` for Claude).
 
-Prerequisite: Google's official **Android SDK Platform-Tools** for Windows, from
+One command does everything below (download and signature check of Platform-Tools, reboot into the bootloader,
+read-only commands, reboot to Android, captures in `firmware/captures/<timestamp>_fastboot/`):
+
+```powershell
+& "<repository>\scripts\fastboot-readonly-check.ps1"            # add -Redact before sharing the output
+```
+
+Manual equivalent. Prerequisite: Google's official **Android SDK Platform-Tools** for Windows, from
 <https://developer.android.com/tools/releases/platform-tools>, unzipped to `C:\platform-tools`. If `fastboot devices`
 shows nothing once the robot is in the bootloader, Windows lacks the driver: Device Manager → the unknown "Android"
 device → update driver with the Google USB Driver (official, same site).
