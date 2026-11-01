@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-11-02 — Stock unlock refused
+
+### Added
+
+* `docs/10-Operations/adb-runbook.md`: unlock attempt (OEM unlocking switch on, `get_unlock_ability: 0`, `oem unlock is not allowed`), LK flag lookup order `config` then `frp` versus Android writing `frp`, routes forward (EDL, root)
+
 ## 2026-11-02 — Bootloader state
 
 ### Added

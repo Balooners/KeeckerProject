@@ -155,9 +155,35 @@ Analysis:
   and its display is the projector over HDMI. Whether the prompt is shown and can be confirmed is the open risk.
 - Any unlock is a write to the robot and is Harold's decision.
 
+### Unlock attempt (2026-11-02, approved by Harold)
+
+1. "OEM unlocking" switched on in Developer options (navigation by Claude over `adb shell input`, confirmation by
+   Harold with the official app's remote; Claude Code's safety classifier blocked Claude from confirming it).
+   Result: `sys.oem_unlock_allowed=1`.
+2. Reboot to the bootloader, `fastboot flashing get_unlock_ability` → **`0`**.
+3. `fastboot flashing unlock` → **`FAILED (remote: 'oem unlock is not allowed')`**. Nothing erased; `fastboot reboot`
+   back to Android. The switch is still on.
+
+Analysis:
+
+- ✅ Mechanism, from Qualcomm's LK source (`app/aboot/aboot.c`, quoted by the
+  [tjtech analysis](https://tjtech.me/analyze-oem-unlocking-under-android.html)): LK looks for the "allow OEM unlock"
+  flag in the last byte of the partition list `{"config", "frp"}`, **`config` first**, `frp` only when `config` does not
+  exist. Android writes the flag to the partition named by `ro.frp.pst`, which is **`frp`** on the K1.
+- 🟡 Probable cause: the K1 partition table has a `config` partition (as many msm8996 tables do), so LK reads `config`
+  where nothing was written, while Android writes `frp`. An integration slip rather than a deliberate lock: Keecker
+  never needed unlocking. Not confirmed: partition names are not readable without root (SELinux denies even a lookup
+  by name).
+- Consequence: the stock unlock path is closed as long as the last byte of `config` is not set. Setting it needs root
+  on Android or Qualcomm EDL (9008) access with a programmer signed for this device (`secure: yes`).
+
 ## Open Questions
 
 - [x] Fastboot read-only check (2026-11-02): bootloader locked, `secure: yes`, stock LK.
+- [x] Stock unlock: refused (`get_unlock_ability: 0` with the switch on).
+- [ ] Confirm the `config` partition (EDL partition table, or the Open-Q 820 / DragonBoard 820c reference `partition.xml`).
+- [ ] Route to set the flag or back up the robot: EDL programmer (Keecker, Intrinsyc/Lantronix), or root on Android 7.0
+      (security patch 2018-01-05, kernel 3.18).
 - [ ] Full partition table (EDL, or a temporary boot once unlocked), and a backup of `persist` and the other
       per-robot partitions before any write.
 - [ ] Unlock confirmation on a robot with one button (look for owner reports, LK source for the DragonBoard 820c).

@@ -278,12 +278,17 @@ One mission at a time; each ends with SESSION_STATE.md and CHANGELOG.md updates 
 - Android sleeps after 5 minutes without input and the projector follows; UDP keys do not wake it,
   `adb shell input keyevent KEYCODE_WAKEUP` does.
 
+- 2026-11-02, unlock attempt approved by Harold: "OEM unlocking" switched on (`sys.oem_unlock_allowed=1`), but
+  `fastboot flashing get_unlock_ability: 0` and `flashing unlock` → `oem unlock is not allowed`. Nothing erased.
+  🟡 Probable cause: LK reads the flag from `config` first, Android writes it to `frp` (`ro.frp.pst`).
+  The switch was left on (harmless).
+
 ## Immediate next step
 
-1. Decide the unlock route (Harold): the stock path is probable ("OEM unlocking" switch, then `fastboot flashing unlock`)
-   but erases userdata, and the confirmation prompt on a one-button robot is unknown. Research first (LK source for
-   msm8996, owner reports), nothing written to the robot until Harold decides.
-2. Backup plan before any write (mission 6): full partition table and `persist` backup (EDL, or temporary boot once
-   unlocked).
+1. Unlock route (decision for Harold): the stock path is closed. Options: (a) EDL (9008) with a programmer signed for
+   the K1 (ask Keecker's founder / Intrinsyc-Lantronix; check public Open-Q 820 material), which would also give the
+   full backup; (b) root on Android 7.0 (patch 2018-01-05, kernel 3.18) to set the last byte of `config`, then the stock
+   unlock. Research both without writing anything to the robot.
+2. Backup plan before any write (mission 6): full partition table and `persist` backup.
 3. Without the robot: LineageOS build preparation (needs Harold's Linux x86_64 machine), open robot service design,
    `spidemux` SPI packet format.
