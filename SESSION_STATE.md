@@ -269,13 +269,21 @@ One mission at a time; each ends with SESSION_STATE.md and CHANGELOG.md updates 
   restored; display mode locked to `PICTURE` (Eco) while plugged in (robot rule); UDP D-pad keys received by the robot
   (`adb logcat`). Projector settings left as found, except the display mode, which the robot holds at `PICTURE` while
   charging (it was reported as `USER` before the tests).
-- Fastboot check not run by Claude: the project deny rules block `adb reboot` and `fastboot`, and Platform-Tools is not
-  installed. Procedure for Harold in `docs/10-Operations/adb-runbook.md`.
+- ✅ Fastboot read-only check run by Harold (`scripts/fastboot-readonly-check.ps1`, after installing the built-in
+  WinUsb driver for `VID_18D1&PID_D00D`): **bootloader locked** (`Device unlocked: false`, `secure: yes`), stock
+  Qualcomm LK 0.5 "Dragon eMMC"; only system/userdata/cache listed. Robot back in Android.
+- Incident 2026-11-02, caused by Claude: a settings command with a relative path, run from Harold's home folder,
+  overwrote his **global** `~/.claude/settings.json` (hooks `garde_ecriture`/`garde_guichet` lost). Restored by Harold
+  from the 2026-09-26 backup plus the `garde_guichet` hook. Lesson: always give absolute paths.
+- Android sleeps after 5 minutes without input and the projector follows; UDP keys do not wake it,
+  `adb shell input keyevent KEYCODE_WAKEUP` does.
 
 ## Immediate next step
 
-1. Bootloader confirmation in fastboot, **run by Harold** (`docs/10-Operations/adb-runbook.md`, "Fastboot read-only
-   check"); no `flash`, `erase`, `oem unlock` or `boot` command.
-2. Backup plan before any write (mission 6): partition list from fastboot, then a full dump method.
+1. Decide the unlock route (Harold): the stock path is probable ("OEM unlocking" switch, then `fastboot flashing unlock`)
+   but erases userdata, and the confirmation prompt on a one-button robot is unknown. Research first (LK source for
+   msm8996, owner reports), nothing written to the robot until Harold decides.
+2. Backup plan before any write (mission 6): full partition table and `persist` backup (EDL, or temporary boot once
+   unlocked).
 3. Without the robot: LineageOS build preparation (needs Harold's Linux x86_64 machine), open robot service design,
    `spidemux` SPI packet format.

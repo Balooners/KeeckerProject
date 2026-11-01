@@ -50,7 +50,7 @@ install an up-to-date system on their own K1, themselves.
 | Companion app protocol | ✅ Documented | Discovery, WebSocket and Bluetooth transports, pairing handshake, encryption · [remote-app-protocol.md](docs/05-Interfaces/remote-app-protocol.md) |
 | Feature inventory | ✅ First version | Everything the K1 did, and how each feature will come back · [FEATURES.md](docs/04-Analysis/FEATURES.md) |
 | Open client for today's robots | ✅ Works on a real K1 | Pairs with the official 6-press method, reads battery and projector status, switches and tilts the projector · [remote-client.md](docs/10-Operations/remote-client.md) |
-| Bootloader and backup | 🔄 In progress | Read-only check done (`flash.locked=0`, to confirm in fastboot); full backup procedure next · [adb-runbook.md](docs/10-Operations/adb-runbook.md) |
+| Bootloader and backup | 🔄 In progress | Bootloader **locked** (fastboot check), standard Qualcomm LK with the Android "OEM unlocking" switch present: the official unlock path is probable, not tried. Backup plan next · [adb-runbook.md](docs/10-Operations/adb-runbook.md) |
 | Android TV build | ⏳ Planned | LineageOS on the msm8996 family (same chip as the Xiaomi Mi 5) |
 
 Every statement in the documentation is backed by evidence and marked ✅ confirmed, 🟡 probable or 🔴 hypothesis.

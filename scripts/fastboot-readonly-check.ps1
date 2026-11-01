@@ -51,20 +51,25 @@ function Run([string]$name, [string]$exe, [string[]]$cmd) {
     return $lines
 }
 
-# 2. Reboot into the bootloader (the robot projects nothing while in fastboot)
-$devices = & $adb devices | Select-String '\tdevice$'
-if (-not $devices) { throw 'No authorised adb device. Plug the robot in over USB and accept the debugging prompt.' }
-Write-Host 'Rebooting the robot into the bootloader...'
-& $adb reboot bootloader
+# 2. Reboot into the bootloader (the robot projects nothing while in fastboot), unless it is already there
+$found = [bool](& $fastboot devices 2>$null | Select-String 'fastboot')
+if ($found) {
+    Write-Host 'Robot already in fastboot.'
+} else {
+    $devices = & $adb devices | Select-String '\tdevice$'
+    if (-not $devices) { throw 'No authorised adb device. Plug the robot in over USB and accept the debugging prompt.' }
+    Write-Host 'Rebooting the robot into the bootloader...'
+    & $adb reboot bootloader
+}
 
-$found = $false
 for ($i = 0; $i -lt 45 -and -not $found; $i++) {
     Start-Sleep -Seconds 2
     $found = [bool](& $fastboot devices 2>$null | Select-String 'fastboot')
 }
 if (-not $found) {
     Write-Warning 'The robot is not visible in fastboot after 90 s. Windows probably lacks the fastboot USB driver.'
-    Write-Warning 'To return to Android: unplug USB, then hold the top button until the robot restarts.'
+    Write-Warning 'Device Manager > "Android" > Update driver > Browse my computer > Let me pick > Universal Serial Bus devices > WinUsb Device.'
+    Write-Warning 'Then run this script again: it continues from fastboot. To abort instead: unplug USB and hold the top button.'
     exit 1
 }
 Write-Host 'Robot in fastboot. Reading only...'

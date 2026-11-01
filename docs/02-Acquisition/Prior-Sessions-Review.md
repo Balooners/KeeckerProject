@@ -17,7 +17,8 @@
 >
 > Update 2026-11-01 (snapshot, [adb-runbook.md](../10-Operations/adb-runbook.md)): `verifiedbootstate=green` is
 > confirmed, `ro.build.type=user`, `ro.secure=1`, `ro.debuggable=0` are confirmed, and `ro.boot.flash.locked=0`.
-> The lock state still needs a fastboot check.
+> The lock state still needs a fastboot check. Done on 2026-11-02: `Device unlocked: false`, `secure: yes`
+> (bootloader locked; see [adb-runbook.md](../10-Operations/adb-runbook.md)).
 >
 > **Owner photos of 2026-06-28** (40 photos of the projected screen and 26 app screenshots, sent by Harold on
 > 2026-11-02; local copy `firmware/captures/photos-2026-06/`, git-ignored). What they show:

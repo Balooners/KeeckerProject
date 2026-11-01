@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-11-02 — Bootloader state
+
+### Added
+
+* Fastboot read-only check on Harold's robot: bootloader **locked** (`Device unlocked: false`, `secure: yes`), stock Qualcomm LK 0.5 "Dragon eMMC", only system/userdata/cache listed (`docs/10-Operations/adb-runbook.md`, ART-0013)
+
+### Changed
+
+* `scripts/fastboot-readonly-check.ps1`: continues when the robot is already in fastboot; WinUSB driver hint for Windows
+* README progress, Prior-Sessions-Review
+
 ## 2026-11-02 — Projector settings and UDP channel verified
 
 ### Added

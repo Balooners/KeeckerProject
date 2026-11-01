@@ -127,9 +127,40 @@ What to read: `Device unlocked: true/false`, `Device critical unlocked`, `Charge
 If the robot shows nothing in bootloader mode (no screen in fastboot), it is expected. If `fastboot reboot` cannot be
 sent, unplug the USB cable and hold the top button until the robot restarts (🟡 exact duration unknown).
 
+### Results of the fastboot check (2026-11-02)
+
+Run by Harold with `scripts/fastboot-readonly-check.ps1`; capture `firmware/captures/2026-11-02_003414_fastboot/`
+(ART-0013). The robot returned to Android by itself.
+
+Windows (ARM64) had no driver for the bootloader interface (`USB\VID_18D1&PID_D00D`, status Error). Fix without any
+download: Device Manager → "Android" → Update driver → Browse my computer → Let me pick → Universal Serial Bus devices →
+WinUsb Device. The script then continued from fastboot.
+
+| Field | Value | Meaning | Confidence |
+|---|---|---|---|
+| `oem device-info` | `Device tampered: false`, `Device unlocked: false`, `Device critical unlocked: false`, `Charger screen enabled: false`, `Display panel: hdmi` | **Bootloader locked.** `ro.boot.flash.locked=0` seen in Android was misleading | ✅ |
+| `secure` | `yes` | Secure boot active: only signed images while locked | ✅ |
+| `kernel`, `version`, `variant`, `product` | `lk`, `0.5`, `Dragon eMMC`, `MSM8996` | Qualcomm's standard Little Kernel bootloader, close to the DragonBoard 820c default (`version-bootloader` empty) | ✅ |
+| Partitions | only `system` (3 GB), `userdata` (≈ 20.8 GB), `cache` (256 MB) are listed | This LK only reports partitions with a declared type; the full table must come from elsewhere | ✅ |
+| `max-download-size` | `0x20000000` (512 MB) | | ✅ |
+| Battery | `battery-voltage: 3808000` (µV), `battery-soc-ok: yes` | 🟡 a single cell value reported by the SoC side | ✅ |
+
+Analysis:
+
+- 🟡 Probable unlock path: standard Qualcomm LK with `Device critical unlocked` support, and the Android "OEM unlocking"
+  switch present. That is the stock Android flow (switch on, then `fastboot flashing unlock`). Not tried.
+- ⚠️ Unlocking erases `userdata` (and `cache`): installed apps, pairings, maps. Per-robot calibration lives in other
+  partitions (🟡 `persist`), normally untouched by an unlock.
+- 🔴 Unknown: LK usually asks for an on-screen confirmation with volume and power keys; the K1 has a single top button
+  and its display is the projector over HDMI. Whether the prompt is shown and can be confirmed is the open risk.
+- Any unlock is a write to the robot and is Harold's decision.
+
 ## Open Questions
 
-- [ ] Fastboot read-only check (above).
+- [x] Fastboot read-only check (2026-11-02): bootloader locked, `secure: yes`, stock LK.
+- [ ] Full partition table (EDL, or a temporary boot once unlocked), and a backup of `persist` and the other
+      per-robot partitions before any write.
+- [ ] Unlock confirmation on a robot with one button (look for owner reports, LK source for the DragonBoard 820c).
 - [x] First run of this procedure on the robot (2026-11-01).
 - [ ] Widevine security level (L1 or L3), for example with a DRM info app.
 - [ ] Fastboot reachability (`adb reboot bootloader`), in a later approved session.
