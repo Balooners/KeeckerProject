@@ -18,6 +18,8 @@ import argparse
 import base64
 import json
 import os
+import socket
+import struct
 import sys
 import threading
 import time
@@ -27,6 +29,7 @@ from pathlib import Path
 from nacl.public import Box, PrivateKey, PublicKey
 
 DEFAULT_PORT = 8080
+UDP_PORT = 43045
 WS_PATH = '/remote/keecker.ws'
 SERVICE_TYPE = '_keecker._tcp.local.'
 PING = b'\xaa'
@@ -107,6 +110,10 @@ AUTH_ERRORS = {
     6: 'IN_SETUP_ALREADY_HAVE_CONNECTION', 7: 'UNHANDLED_EXCEPTION', 8: 'USER_ACCESS_HAS_NOT_STARTED',
     9: 'USER_ACCESS_HAS_FINISHED', 10: 'PERSISTANCE_ERROR', 11: 'FORCE_UPGRADE',
 }
+# Real-time UDP commands (port 43045). MOVE (48) drives the robot and is deliberately absent.
+UDP_KEYS = {'up': 32, 'down': 33, 'left': 34, 'right': 35, 'ok': 36, 'back': 37, 'home': 38, 'playpause': 39}
+DISPLAY_MODES = ['BRIGHTEST', 'VIVID', 'MOVIE', 'PICTURE', 'USER']
+
 R_PROJECTOR_STATUS = {
     1: ('ledOn', 'bool'), 2: ('keystone', 'int'), 3: ('autoKeystone', 'bool'), 4: ('zoom', 'int'),
     5: ('brightness', 'int'), 6: ('contrast', 'int'),
@@ -265,6 +272,12 @@ class RobotLink:
             self.box = Box(identity.private_key, PublicKey(robot_key))
             return robot_key
 
+    def send_udp(self, host, command, x=0.0, y=0.0, port=UDP_PORT):
+        """One encrypted real-time datagram: command byte + two big-endian doubles, crypto_box with the session keys."""
+        payload = struct.pack('>Bdd', command, x, y)
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+            sock.sendto(bytes(self.box.encrypt(payload)), (host, port))
+
     def close(self):
         self.closed.set()
         try:
@@ -348,9 +361,33 @@ def cmd_projector(args):
             sys.exit('tilt must be between 0 (wall) and 90 (ceiling)')
         link.send('projection.OrientationMessage', encode([(1, args.tilt)]))
         print(f'-> projector tilt {args.tilt}')
+    for name, value in (('Focus', args.focus), ('Keystone', args.keystone)):
+        if value is not None:
+            auto = value == 'auto'
+            link.send(f'projection.{name}Message', encode([(1, 0 if auto else int(value)), (2, auto)]))
+            print(f'-> projector {name.lower()} {value}')
+    for name, value in (('Brightness', args.brightness), ('Zoom', args.zoom)):
+        if value is not None:
+            link.send(f'projection.{name}Message', encode([(1, value)]))
+            print(f'-> projector {name.lower()} {value}')
+    if args.mode is not None:
+        link.send('projection.DisplayModeMessage', encode([(1, DISPLAY_MODES.index(args.mode))]))
+        print(f'-> projector mode {args.mode}')
     time.sleep(1)
     link.send('projection.ProjectorStatusMessage')
     listen(link, 3)
+    link.close()
+
+
+def cmd_key(args):
+    # The robot only accepts UDP from an address that holds an authenticated WebSocket session.
+    link = open_session(args)
+    time.sleep(0.5)
+    for key in args.keys:
+        link.send_udp(args.host, UDP_KEYS[key])
+        print(f'-> key {key}')
+        time.sleep(args.delay)
+    time.sleep(0.5)
     link.close()
 
 
@@ -446,7 +483,18 @@ def main():
     robot_args(p)
     p.add_argument('--led', choices=['on', 'off'])
     p.add_argument('--tilt', type=int)
+    p.add_argument('--focus', help='0-100, or auto')
+    p.add_argument('--keystone', help='0-100, or auto')
+    p.add_argument('--brightness', type=int, help='0-100')
+    p.add_argument('--zoom', type=int, help='0-100 (50 = no zoom)')
+    p.add_argument('--mode', choices=DISPLAY_MODES)
     p.set_defaults(func=cmd_projector)
+
+    p = sub.add_parser('key', help='send remote-control keys over the encrypted UDP channel')
+    robot_args(p)
+    p.add_argument('keys', nargs='+', choices=sorted(UDP_KEYS))
+    p.add_argument('--delay', type=float, default=1.0, help='seconds between keys')
+    p.set_defaults(func=cmd_key)
 
     p = sub.add_parser('listen', help='print every message the robot sends')
     robot_args(p)

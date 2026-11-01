@@ -265,11 +265,17 @@ One mission at a time; each ends with SESSION_STATE.md and CHANGELOG.md updates 
 - ✅ Owner photos of 2026-06-28 reviewed (2026-11-02): the **"OEM unlocking" switch exists** in Developer options
   (off, not greyed out); app screens analysed in `docs/04-Analysis/Companion-App-Screens.md`. Harold may take more
   screenshots of the app.
+- ✅ 2026-11-02, Harold asked for "all the necessary tests": projector brightness, focus, keystone, zoom verified and
+  restored; display mode locked to `PICTURE` (Eco) while plugged in (robot rule); UDP D-pad keys received by the robot
+  (`adb logcat`). Projector settings left as found, except the display mode, which the robot holds at `PICTURE` while
+  charging (it was reported as `USER` before the tests).
+- Fastboot check not run by Claude: the project deny rules block `adb reboot` and `fastboot`, and Platform-Tools is not
+  installed. Procedure for Harold in `docs/10-Operations/adb-runbook.md`.
 
 ## Immediate next step
 
-1. Bootloader confirmation in fastboot (`adb reboot bootloader`, `fastboot oem device-info`, `fastboot getvar all`):
-   needs a reboot, so **Harold's explicit approval first**; no `flash`, `erase`, `oem unlock` or `boot` command.
+1. Bootloader confirmation in fastboot, **run by Harold** (`docs/10-Operations/adb-runbook.md`, "Fastboot read-only
+   check"); no `flash`, `erase`, `oem unlock` or `boot` command.
 2. Backup plan before any write (mission 6): partition list from fastboot, then a full dump method.
 3. Without the robot: LineageOS build preparation (needs Harold's Linux x86_64 machine), open robot service design,
    `spidemux` SPI packet format.

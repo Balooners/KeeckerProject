@@ -42,7 +42,7 @@ Tapping a tile launches the app on the projector.
 
 | Sub-tab | Content | Protocol |
 |---|---|---|
-| D-pad | Arrows, OK, then back, home, play/pause and microphone buttons | 🟡 UDP `DPAD_*` commands |
+| D-pad | Arrows, OK, then back, home, play/pause and microphone buttons | ✅ UDP `DPAD_*` commands (tested 2026-11-02) |
 | Touchpad | Large touch area plus a vertical scroll strip, same bottom buttons | 🟡 UDP `MOUSE_*` commands |
 | Keyboard | Text field with the phone keyboard, typed text goes to the robot | 🟡 keyboard messages (`KeyboardManager`) |
 
@@ -53,10 +53,10 @@ Each sub-tab shows a side view of the projector and a slider, plus a "Projector 
 | Sub-tab | Content | Protocol |
 |---|---|---|
 | Orientation | Tilt slider (wall to ceiling) | ✅ `OrientationMessage` (tested 2026-11-01) |
-| Focus | Slider and "Auto" switch | 🟡 `FocusMessage` (`auto`) |
-| Brightness | Slider | 🟡 `BrightnessMessage` |
-| Shape | Keystone slider and "Auto" switch | 🟡 `KeystoneMessage` (`auto`) |
-| Advanced | Horizontal and vertical flip switches, zoom slider (×1.0), projection mode Normal / Film / Eco; note: "Keecker can only be in Eco mode while charging" | 🟡 `FlipMessage`, `ZoomMessage`, `DisplayModeMessage` |
+| Focus | Slider and "Auto" switch | ✅ `FocusMessage` (`value`, `auto`), tested 2026-11-02 |
+| Brightness | Slider | ✅ `BrightnessMessage`, tested 2026-11-02 |
+| Shape | Keystone slider and "Auto" switch | ✅ `KeystoneMessage` (`value`, `auto`), tested 2026-11-02 |
+| Advanced | Horizontal and vertical flip switches, zoom slider (×1.0), projection mode Normal / Film / Eco; note: "Keecker can only be in Eco mode while charging" | 🟡 `FlipMessage`; ✅ `ZoomMessage`; `DisplayModeMessage`: ✅ "Eco" = `PICTURE` (the only mode accepted while plugged in), 🟡 "Normal" and "Film" probably `USER` and `MOVIE` |
 | "Projector on" switch | Turns the projected image on or off | 🟡 `LedsMessage`, which ✅ switches the light source (tested 2026-11-01) |
 
 ### 5. Settings
@@ -85,6 +85,7 @@ on Keecker servers.
 
 ## Open Questions
 
-- [ ] Verify on the robot each 🟡 mapping above, starting with focus, brightness, keystone and display mode.
+- [x] Focus, brightness, keystone, zoom, D-pad verified on the robot (2026-11-02).
+- [ ] Remaining 🟡 mappings: flip, Normal/Film modes (robot unplugged), touchpad, keyboard, settings switches.
 - [ ] Message behind the "safety sensors" switch. Never disable the safeties during tests.
 - [ ] Rooms, spots and map messages once a map exists on the robot.

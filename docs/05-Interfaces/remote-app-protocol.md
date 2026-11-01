@@ -51,6 +51,9 @@ on the same Wi-Fi ([remote-client.md](../10-Operations/remote-client.md)):
 | `projector --led off`, then `--led on` | Status reports `ledOn` false, then true. A first 4-second test went unnoticed; with 10 seconds off, Harold saw the projected image go dark. `LedsMessage` switches the **projector light source** | ✅ |
 | `projector --tilt 30`, then `--tilt 7` | The projector head moved up, then back. Status: `orientation` 28 (then 12 while moving back, 7 at rest); automatic keystone follows (`keystone` −40 at 28°) | ✅ |
 | Second connection | Accepted without pairing (key remembered by the robot) | ✅ |
+| 2026-11-02: `--brightness 100/50`, `--focus 20/auto`, `--keystone 30/auto`, `--zoom 70/50` | Each value reported back by the robot, then restored (manual focus and keystone clear their `auto` flag; `auto` sets it back) | ✅ |
+| 2026-11-02: `--mode MOVIE`, then `USER` | Ignored: the robot reports `PICTURE`. The projector manager refuses every mode except `PICTURE` while the robot is plugged in (robot code), which is the app's "Eco only while charging" rule | ✅ rule; mode change while unplugged not tested |
+| 2026-11-02: UDP keys `right`, `left` | Robot log (`adb logcat`): `UDPSocketManager: Command received: DPAD_RIGHT`, then `DPAD_LEFT`, injected as Android key events (dropped by the foreground window, which had no focus at that moment) | ✅ channel, layout and encryption |
 
 The read-only snapshot of the same day also shows the listening sockets: TCP 8080, UDP 43045, and the local bridge
 socket `@com.keecker.services.remote.keecker.ws` in `/proc/net/unix`.
@@ -106,8 +109,8 @@ joystick and pointer input:
 - A datagram is accepted only from an IP address that already has an authenticated WebSocket session; it is
   decrypted with that phone's public key (same crypto manager as the WebSocket).
 - Plain content (`UDPMessage`): 1 command byte, then `x` and `y` as two 64-bit IEEE doubles, big-endian
-  (Java `ByteBuffer` default), 17 bytes. 🟡 The robot decrypts its whole receive buffer (`ENCRYPTED_SIZE`), so a client
-  should send exactly nonce (24) + MAC (16) + 17 = 57 bytes.
+  (Java `ByteBuffer` default), 17 bytes, sent as nonce (24) + MAC (16) + 17 = 57 bytes ✅ (accepted by the robot on
+  2026-11-02).
 - Commands (IDs from the official app, where the enum initialiser is intact):
 
 | ID | Command | Robot action |
@@ -202,6 +205,7 @@ without any Keecker server.
 - [x] Framing inside the binary WebSocket frames: one message per frame, no length prefix; `0xAA` keep-alive.
 - [x] Server side: Jetty `HttpServerService`, `WebsocketHandler` bridge, `WebSocketServer` and `RemoteCommunicationImp` in the remote service.
 - [x] First live run of the test client (pairing, projector status, LED): 2026-11-01, see Evidence.
-- [ ] Live test of the UDP channel (pointer, D-pad).
+- [x] Live test of the UDP channel: D-pad keys received and injected (2026-11-02).
+- [ ] Pointer (`MOUSE_*`) commands; display modes while unplugged.
 - [x] Role of UDP port 43045: encrypted real-time pointer, D-pad and manual driving commands (see Real-time control over UDP).
 - [ ] Role of BLE (advertisement content) and of the Bluetooth RFCOMM link during setup.

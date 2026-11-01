@@ -91,8 +91,38 @@ Harold's robot over USB, `adb devices`: `product:keecker_k1_mb02 model:Keecker d
 Not readable as `shell`: `/proc/cmdline`, `/proc/device-tree`, `/data/misc/keecker/`, partition names, some
 `/system/bin` entries (`battery_reader`, `ihm_touch`, `iop`). `grep` on `/proc/net/unix` needs `-a`.
 
+## Fastboot read-only check (run by Harold)
+
+Goal: confirm the bootloader lock state and read the partition list. It needs a reboot into the bootloader, so it is
+run by Harold himself (the project's Claude Code deny rules block `adb reboot` and `fastboot` for Claude).
+
+Prerequisite: Google's official **Android SDK Platform-Tools** for Windows, from
+<https://developer.android.com/tools/releases/platform-tools>, unzipped to `C:\platform-tools`. If `fastboot devices`
+shows nothing once the robot is in the bootloader, Windows lacks the driver: Device Manager → the unknown "Android"
+device → update driver with the Google USB Driver (official, same site).
+
+Allowed commands, all read-only:
+
+```powershell
+adb reboot bootloader                                   # the robot restarts into the bootloader
+C:\platform-tools\fastboot.exe devices
+C:\platform-tools\fastboot.exe oem device-info 2>&1 | Tee-Object firmware\captures\fastboot-device-info.txt
+C:\platform-tools\fastboot.exe getvar all 2>&1 | Tee-Object firmware\captures\fastboot-getvar-all.txt
+C:\platform-tools\fastboot.exe reboot                   # back to Android
+```
+
+⛔ Never in this check: `flash`, `erase`, `format`, `oem unlock`, `flashing unlock`, `boot`, `set_active`,
+`oem` commands other than `device-info`.
+
+What to read: `Device unlocked: true/false`, `Device critical unlocked`, `Charger screen enabled`, and the
+`partition-type` / `partition-size` lines (names and sizes of all partitions, needed for the backup plan).
+
+If the robot shows nothing in bootloader mode (no screen in fastboot), it is expected. If `fastboot reboot` cannot be
+sent, unplug the USB cable and hold the top button until the robot restarts (🟡 exact duration unknown).
+
 ## Open Questions
 
+- [ ] Fastboot read-only check (above).
 - [x] First run of this procedure on the robot (2026-11-01).
 - [ ] Widevine security level (L1 or L3), for example with a DRM info app.
 - [ ] Fastboot reachability (`adb reboot bootloader`), in a later approved session.

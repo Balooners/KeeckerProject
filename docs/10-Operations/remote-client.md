@@ -13,7 +13,8 @@ status messages and a harmless projector command. This is the base of the future
 
 ## Safety
 
-- The client reads status and drives only the projector LED and tilt. It never sends a movement command.
+- The client reads status, drives the projector (light, tilt, focus, brightness, keystone, zoom, mode) and sends
+  remote-control keys. It never sends a movement command (UDP `MOVE` is deliberately not implemented).
 - Pairing adds one admin user on the robot. It does not remove the existing users, unless the robot is in its setup
   state (first start or factory reset): do not run it on a robot in setup.
 - The client key pair and the robot keys it has seen are stored in `%USERPROFILE%\.keeckeros\remote-client.json`.
@@ -63,9 +64,26 @@ status messages and a harmless projector command. This is the base of the future
    kr scripts\remote-client\keecker_remote.py projector --host <robot-ip> --tilt 45
    ```
 
-5. Optional: `listen --host <robot-ip> --seconds 30` prints every message the robot pushes, for the documentation.
+   Other projector settings, each reported back by the robot (restore the previous values after a test):
 
-6. Copy the console output into a file under `firmware/captures/` (git-ignored) and tell Claude.
+   ```powershell
+   kr scripts\remote-client\keecker_remote.py projector --host <robot-ip> --brightness 100   # 0-100
+   kr scripts\remote-client\keecker_remote.py projector --host <robot-ip> --focus 20         # or auto
+   kr scripts\remote-client\keecker_remote.py projector --host <robot-ip> --keystone auto    # or 0-100
+   kr scripts\remote-client\keecker_remote.py projector --host <robot-ip> --zoom 50          # 50 = no zoom
+   kr scripts\remote-client\keecker_remote.py projector --host <robot-ip> --mode PICTURE     # only PICTURE while plugged in
+   ```
+
+5. Remote-control keys over the encrypted UDP channel (port 43045). Keys reach Android only when the foreground
+   window has focus; `adb logcat -d | Select-String UDPSocketManager` shows what the robot received.
+
+   ```powershell
+   kr scripts\remote-client\keecker_remote.py key --host <robot-ip> right left
+   ```
+
+6. Optional: `listen --host <robot-ip> --seconds 30` prints every message the robot pushes, for the documentation.
+
+7. Copy the console output into a file under `firmware/captures/` (git-ignored) and tell Claude.
 
 ## Troubleshooting
 

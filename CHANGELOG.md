@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-11-02 — Projector settings and UDP channel verified
+
+### Added
+
+* `scripts/remote-client/keecker_remote.py`: `projector --focus/--keystone/--brightness/--zoom/--mode` and `key` (D-pad over the encrypted UDP channel; `MOVE` still not implemented)
+* `docs/10-Operations/adb-runbook.md`: fastboot read-only check, to be run by Harold
+
+### Changed
+
+* `docs/05-Interfaces/remote-app-protocol.md`: live results for brightness, focus, keystone, zoom, display mode rule while plugged in, UDP D-pad
+* `docs/04-Analysis/Companion-App-Screens.md`: mappings verified on the robot
+
 ## 2026-11-02 — Owner photos and app screens
 
 ### Added
