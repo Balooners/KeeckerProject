@@ -18,6 +18,27 @@
 > Update 2026-11-01 (snapshot, [adb-runbook.md](../10-Operations/adb-runbook.md)): `verifiedbootstate=green` is
 > confirmed, `ro.build.type=user`, `ro.secure=1`, `ro.debuggable=0` are confirmed, and `ro.boot.flash.locked=0`.
 > The lock state still needs a fastboot check.
+>
+> **Owner photos of 2026-06-28** (40 photos of the projected screen and 26 app screenshots, sent by Harold on
+> 2026-11-02; local copy `firmware/captures/photos-2026-06/`, git-ignored). What they show:
+>
+> - ✅ Settings → Developer options shows the **"OEM unlocking"** switch ("allow the bootloader to be unlocked"),
+>   **off and not greyed out** (photo 2026-06-28 10:09:43). Android only shows it when an OEM unlock path exists; it
+>   matches `sys.oem_unlock_allowed=0` and `ro.frp.pst` in the 2026-11-01 snapshot. Turning it on writes the `frp`
+>   partition: a decision for Harold, not part of any read-only session.
+> - ✅ ADB over Wi-Fi was enabled with the third-party app Wireless ADB (`com.origiq.wirelessadb`), port 5555,
+>   "root access: not requested".
+> - ✅ Installed packages with versions, among them: `com.keecker.services` 1.14.6 (label "Appel vidéo"),
+>   `com.keecker.services.ota` 1.11.2 ("Keecker - Mise à Jour du Système"), `com.keecker.apps.data` 1.14.1,
+>   `com.keecker.apps.diagnostic` 1.14.1, `com.keecker.apps.launcher_netflix` 1.11.0 ("AppsLauncher"), Android TV
+>   Remote Service 2.0.0, YouTube 5.30.320, Netflix 6.26.1, Molotov 5.51.0, AirScreen, AlfredCamera, Smarters Pro.
+> - ✅ Activities of `com.keecker.services` listed with an activity launcher: `touchwall.TouchWallActivity`,
+>   `media.PlayerActivity`, `setup.PreSetupActivity`, `setup.PostSetupActivity`, `ProjectionActivity`; and
+>   `ota.UpdateActivity` in `com.keecker.services.ota`, `DiagnosticActivity` in the diagnostic app.
+> - ✅ Launching the setup activity shows the original onboarding screens (robot and projected screen drawing, then a
+>   hand touching the projected image: the touch projection tutorial).
+>
+> The app screenshots are analysed in [Companion-App-Screens.md](../04-Analysis/Companion-App-Screens.md).
 
 ## Règle de qualification
 

@@ -1,6 +1,6 @@
 # SESSION_STATE.md
 
-Last update: 2026-11-01
+Last update: 2026-11-02
 
 ## Current phase
 
@@ -262,6 +262,9 @@ One mission at a time; each ends with SESSION_STATE.md and CHANGELOG.md updates 
 - Robot state changed with Harold's approval: the test client is now a paired **admin** device on the robot
   (key in `%USERPROFILE%\.keeckeros\remote-client.json` on Harold's PC). Nothing else was written.
 - ✅ `adb pull /system/bin/spidemux` (read-only copy, ART-0011): STM readings come over SPI.
+- ✅ Owner photos of 2026-06-28 reviewed (2026-11-02): the **"OEM unlocking" switch exists** in Developer options
+  (off, not greyed out); app screens analysed in `docs/04-Analysis/Companion-App-Screens.md`. Harold may take more
+  screenshots of the app.
 
 ## Immediate next step
 

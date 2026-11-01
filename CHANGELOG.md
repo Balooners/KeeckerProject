@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-11-02 — Owner photos and app screens
+
+### Added
+
+* `docs/04-Analysis/Companion-App-Screens.md`: the five tabs of the official app 2.0.3, each control linked to a protocol message
+* `docs/02-Acquisition/Prior-Sessions-Review.md`: owner photos of 2026-06-28, including the "OEM unlocking" switch in Developer options (present, off)
+
+### Changed
+
+* `docs/10-Operations/adb-runbook.md`: bootloader row completed with the OEM unlocking switch
+
 ## 2026-11-01 — First session with the robot
 
 ### Added

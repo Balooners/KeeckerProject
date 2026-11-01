@@ -78,7 +78,7 @@ Harold's robot over USB, `adb devices`: `product:keecker_k1_mb02 model:Keecker d
 
 | Question | Result | Confidence |
 |---|---|---|
-| Bootloader lock | `ro.boot.flash.locked=0`, `ro.boot.verifiedbootstate=green`, `ro.boot.veritymode=enforcing`, `ro.oem_unlock_supported` empty, `sys.oem_unlock_allowed=0`, `settings oem_unlock_allowed` = null | 🟡 The kernel was told "not locked" while verified boot is green: unusual pair, to confirm in fastboot (`fastboot oem device-info`, needs a reboot and Harold's approval) |
+| Bootloader lock | `ro.boot.flash.locked=0`, `ro.boot.verifiedbootstate=green`, `ro.boot.veritymode=enforcing`, `ro.oem_unlock_supported` empty, `sys.oem_unlock_allowed=0`, `settings oem_unlock_allowed` = null | 🟡 The kernel was told "not locked" while verified boot is green: unusual pair, to confirm in fastboot (`fastboot oem device-info`, needs a reboot and Harold's approval). ✅ The "OEM unlocking" switch exists in Developer options, off (owner photo 2026-06-28, [Prior-Sessions-Review.md](../02-Acquisition/Prior-Sessions-Review.md)) |
 | Build | `user`, `release-keys`, `ro.secure=1`, `ro.debuggable=0`, `ro.adb.secure=1`; fingerprint `Keecker/keecker_k1_mb02/keecker_k1:7.0/NRD90M/100140002:user/release-keys`, security patch 2018-01-05 | ✅ |
 | Root | No `su`; `adb shell` runs as `shell` | ✅ |
 | SoC and kernel | APQ8096 (soc_id 291), Linux 3.18.31 built 2019-03-04 | ✅ |
