@@ -1,7 +1,9 @@
 # Remote Client — Test Procedure
 
-**Status:** Ready, offline self-test passes; not yet run against a robot
-**Last update:** 2026-10-28
+**Status:** Verified on a robot on 2026-11-01: discovery, pairing, status, projector light off/on, tilt
+
+Tip: keep the light off for about 10 seconds when testing `--led`; a short test is easy to miss.
+**Last update:** 2026-11-01
 
 ## Objective
 

@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-11-01 — First session with the robot
+
+### Added
+
+* Live test of the open client on Harold's K1: mDNS discovery, refusal of an unknown key, 6-press pairing, encrypted session, battery and projector status, projector light off/on and tilt (`docs/05-Interfaces/remote-app-protocol.md`, `docs/10-Operations/remote-client.md`)
+* First read-only snapshot (`docs/10-Operations/adb-runbook.md`): `ro.boot.flash.locked=0` with verified boot green, APQ8096 confirmed, kernel 3.18.31, ports, DRM, robot daemons
+* STM readings path confirmed: `/system/bin/spidemux` reads the STM32F3 over SPI (`/dev/spidev9.0`, GPIO 115) and serves six `@socket.stm.*` sockets (`docs/05-Interfaces/stm32-protocol.md`)
+* Artifact Register: ART-0011 `spidemux`, ART-0012 snapshot
+
+### Changed
+
+* `scripts/robot-readonly-snapshot.ps1`: `grep -a` on `/proc/net/unix`
+* README progress table
+
 ## 2026-10-28 — STM readings and UDP control channel
 
 ### Changed

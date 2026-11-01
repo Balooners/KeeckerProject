@@ -14,6 +14,10 @@
 > 🟡 Notable: a past `getprop` reportedly showed verified boot **green**. On Qualcomm Android 7 devices, `green`
 > normally means a locked bootloader with a verified image. This must be confirmed with `ro.boot.flash.locked` and
 > `ro.oem_unlock_supported`.
+>
+> Update 2026-11-01 (snapshot, [adb-runbook.md](../10-Operations/adb-runbook.md)): `verifiedbootstate=green` is
+> confirmed, `ro.build.type=user`, `ro.secure=1`, `ro.debuggable=0` are confirmed, and `ro.boot.flash.locked=0`.
+> The lock state still needs a fastboot check.
 
 ## Règle de qualification
 

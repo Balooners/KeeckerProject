@@ -63,7 +63,7 @@ Shell 'dev-all' 'ls -l /dev'
 Shell 'su-check' 'which su; ls -l /system/xbin/su /system/bin/su 2>&1; id'
 
 Write-Host 'STM readings path (which program serves @socket.stm.*)'
-Shell 'stm-sockets' 'head -1 /proc/net/unix; grep -iE "stm|keecker" /proc/net/unix'
+Shell 'stm-sockets' 'head -1 /proc/net/unix; grep -a -iE "stm|keecker" /proc/net/unix'
 Shell 'processes' 'ps; echo ===; ps -A 2>&1'
 Shell 'init-rc' 'grep -rniE "stm|ttyHSL|resetboard|keecker" /init*.rc /system/etc/init /vendor/etc/init 2>/dev/null'
 Shell 'system-bins' 'ls -l /system/bin /system/vendor/bin /vendor/bin 2>/dev/null | grep -iE "stm|keecker|robot|motor"'

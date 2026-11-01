@@ -39,6 +39,10 @@ Abbreviations used below: "Support guide" is the official 85-page Support Q&A (2
 The Open-Q 820 is a commercial module, not a Keecker design. Intrinsyc (now Lantronix) sold it with 3 GB LPDDR4 and 32 GB UFS, which matches the K1 32 GB version. Its vendor lists **Debian Linux** among its supported operating systems. The SoC variant on Open-Q modules is the APQ8096, the version of the Snapdragon 820 without a cellular modem. The same SoC is used by the DragonBoard 820c, which has mainline Linux support (`arch/arm64/boot/dts/qcom/apq8096-db820c.dts`).
 
 - 🟡 Probable: the K1 SoC is an APQ8096 rather than an MSM8996. The repository so far says "MSM8996", which comes from Android properties. To verify: `/proc/device-tree/model`, `/proc/device-tree/compatible`, `ro.board.platform`.
+- ✅ Confirmed on the robot (snapshot 2026-11-01, `/sys/devices/soc0/`): `machine` = **APQ8096**, `soc_id` 291,
+  `hw_platform` = Dragon, revision 3.1. Android still reports `ro.board.platform=msm8996` (the shared Qualcomm tree).
+  Kernel: Linux 3.18.31, built by Keecker's CI on 2019-03-04 (`3.18.31-g3cb52260341-dirty`, GCC 4.9).
+- ✅ The device tree files are not readable without root (`/proc/device-tree/*`: permission denied).
 - 🟡 Probable: Lantronix datasheets and user guides for the Open-Q 820 (module pinout, power, boot) apply to the K1 compute module. This would make a Linux port much more realistic than on a fully custom board.
 
 ### Motion
@@ -110,7 +114,7 @@ All values ✅ Confirmed from official documents.
 
 ## Open Questions
 
-- [ ] Exact SoC variant (APQ8096 or MSM8996) and device tree `model` / `compatible` on the robot.
+- [x] Exact SoC variant: APQ8096 (2026-11-01). Device tree `model` / `compatible` need root to read.
 - [x] Physical link to the motion MCU: UART `/dev/ttyHSL1` ([stm32.md](stm32.md)). Frame format still to decode.
 - [ ] Depth camera model and interface (USB or MIPI CSI). `libzcam*` / `ZcamService` are candidates.
 - [ ] Projector control path: focus and tilt motors are driven by the STM ([stm32.md](stm32.md)); keystone and LED driver still unknown.

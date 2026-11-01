@@ -442,7 +442,7 @@ def main():
     p.add_argument('--seconds', type=float, default=5)
     p.set_defaults(func=cmd_status)
 
-    p = sub.add_parser('projector', help='switch the projector LED, or tilt the projector (0 wall, 90 ceiling)')
+    p = sub.add_parser('projector', help='switch the projector light source (LED), or tilt the projector (0 wall, 90 ceiling)')
     robot_args(p)
     p.add_argument('--led', choices=['on', 'off'])
     p.add_argument('--tilt', type=int)

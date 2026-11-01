@@ -1,6 +1,6 @@
 # SESSION_STATE.md
 
-Last update: 2026-10-28
+Last update: 2026-11-01
 
 ## Current phase
 
@@ -232,7 +232,7 @@ One mission at a time; each ends with SESSION_STATE.md and CHANGELOG.md updates 
 | 1 | `services-api` SDK mapping: `docs/05-Interfaces/Services-API.md`, AIDL → services, services without AIDL, `embedded/stm`, ROS 2 mapping, other public Keecker repositories | No | Started: public repositories reviewed (see `docs/02-Acquisition/Public-Sources.md`) |
 | 2 | Reverse environment: REA + Ghidra in WSL2 | No | Done 2026-10-28 (`docs/10-Operations/Reverse-Environment.md`) |
 | 3 | DEX recovery from the ODEX, Java analysis of priority services | No (unless bootclasspath is missing) | |
-| 4 | Read-only bootloader check + `libhw_robot_jni.so` analysis | Yes, read-only | |
+| 4 | Read-only bootloader check + `libhw_robot_jni.so` analysis | Yes, read-only | Done 2026-11-01: `flash.locked=0` with verified boot green (fastboot check pending), STM link fully mapped (UART commands, SPI readings via `spidemux`) |
 | 5 | `docs/04-Analysis/FEATURES.md` | No | First version 2026-10-28 from public sources |
 | 6 | Full partition dump, `persist` backup, EDL (Qualcomm 9008) study | Yes, procedure validated by Harold first | |
 
@@ -253,13 +253,20 @@ One mission at a time; each ends with SESSION_STATE.md and CHANGELOG.md updates 
 - No destructive commands.
 - No modification of the robot.
 
+## Session of 2026-11-01 (robot at home, USB)
+
+- ✅ Read-only snapshot done (`firmware/captures/2026-11-01_234644/`, results in `docs/10-Operations/adb-runbook.md`).
+  `ro.boot.flash.locked=0`, `verifiedbootstate=green`; APQ8096; no root.
+- ✅ Open client works on the real robot: discovery, pairing, encrypted session, battery and projector status,
+  projector light off/on (seen by Harold), tilt (seen by Harold).
+- Robot state changed with Harold's approval: the test client is now a paired **admin** device on the robot
+  (key in `%USERPROFILE%\.keeckeros\remote-client.json` on Harold's PC). Nothing else was written.
+- ✅ `adb pull /system/bin/spidemux` (read-only copy, ART-0011): STM readings come over SPI.
+
 ## Immediate next step
 
-The robot is away from Harold for several days (from 2026-10-28). When it is back, one home session:
-
-1. `scripts/robot-readonly-snapshot.ps1` (`docs/10-Operations/adb-runbook.md`): bootloader, partitions, kernel, ports, DRM.
-2. `scripts/remote-client/keecker_remote.py` (`docs/10-Operations/remote-client.md`): discovery, 6-press pairing,
-   projector status, LED and tilt.
-
-Until then, without the robot: preparation of the LineageOS build (needs Harold's Linux x86_64 machine), and the
-open robot service design (STM driver from `docs/05-Interfaces/stm32-protocol.md`).
+1. Bootloader confirmation in fastboot (`adb reboot bootloader`, `fastboot oem device-info`, `fastboot getvar all`):
+   needs a reboot, so **Harold's explicit approval first**; no `flash`, `erase`, `oem unlock` or `boot` command.
+2. Backup plan before any write (mission 6): partition list from fastboot, then a full dump method.
+3. Without the robot: LineageOS build preparation (needs Harold's Linux x86_64 machine), open robot service design,
+   `spidemux` SPI packet format.

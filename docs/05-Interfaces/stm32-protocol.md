@@ -1,6 +1,6 @@
 # STM UART Protocol (SoC → motion microcontroller)
 
-**Status:** In Progress (commands and readings decoded statically; device tests pending)
+**Status:** In Progress (commands and readings decoded statically; reading path confirmed on the robot 2026-11-01; motion tests pending)
 **Last update:** 2026-10-28
 
 ## Objective
@@ -88,10 +88,27 @@ sockets and receives fixed **7-byte** messages:
 | `@socket.stm.projector` | focus, tilt, calibration |
 | `@socket.stm.imu` | accelerometer, gyroscope, magnetometer |
 | `@socket.stm.ir` | IR ranges, errors, calibration (opened only when a configuration level is 2 or more) |
+| `@socket.stm.battery` | Battery (not used by `libhw_robot_jni.so`; 🟡 read by the `battery_reader` system daemon) |
 
-The program that owns the UART receive side and serves these sockets is **not** in `com.keecker.services.apk` nor in
-the other extracted APKs (no `bind`/`listen` there). 🔴 Hypothesis: a native system daemon. To identify on the robot,
-read-only: `/proc/net/unix`, process list, init `.rc` files (added to `scripts/robot-readonly-snapshot.ps1`).
+### Readings come over SPI, through `spidemux` ✅ Confirmed (2026-11-01)
+
+The server of these sockets is the native system daemon **`/system/bin/spidemux`** (root, started by init early at
+boot; artifact ART-0011 in the [Artifact Register](../03-Evidence/Artifact-Register.md)). Evidence:
+
+- On the robot, `/proc/net/unix` lists six listening abstract sockets `@socket.stm.{status,propulsion,projector,imu,battery,ir}`
+  with low inode numbers (created early at boot), plus their connected clients (snapshot of 2026-11-01).
+- `spidemux` imports `socket`, `bind`, `listen`, `accept`, `send`, `epoll_*`, and contains the six socket names.
+- Its strings name the transport: **`/dev/spidev9.0`** (SPI), a data-ready interrupt on **GPIO 115**
+  (`/sys/class/gpio/gpio115/edge` set to `rising`, then `value` polled), and `/dev/resetboard`.
+- It validates each SPI packet (messages "bad first byte", "bad packet size", "packet checksum failed"), then sends
+  the 7-byte readings to the matching socket. It also runs a resynchronisation thread.
+- It names the microcontroller: **`/dev/k1.stm32f3.state`**, so the STM is an **STM32F3** part.
+- It reads `/dev/k1.hardware.version` (robot hardware revision), writes the STM identifier to
+  `/data/misc/keecker/stm_uuid` and to the property `ro.stm_uuid`, and reads `sys.ihm.started`.
+- It can force an STM firmware update ("version check timeout, force FW update !").
+
+So the link is split: **commands SoC → STM over UART** (`/dev/ttyHSL1`, `libhw_robot_jni.so`), **readings STM → SoC
+over SPI** (`/dev/spidev9.0`, `spidemux`). The SPI packet format itself is not decoded yet.
 
 Reading message layout:
 
@@ -141,7 +158,9 @@ The command direction of the protocol is simple: 115200 baud 8N1, 7-byte frames 
 ## Open Questions
 
 - [x] Readings direction (STM → SoC): 7-byte messages over five abstract sockets, IDs and decoding (see Readings direction).
-- [ ] Which program owns the UART receive side and serves `@socket.stm.*`, and the raw UART frame it reads from the STM.
+- [x] Which program serves `@socket.stm.*`: `spidemux`, reading the STM over SPI `/dev/spidev9.0` (see above).
+- [ ] SPI packet format in `spidemux` (start byte, size, checksum, resync), SPI mode and speed.
+- [ ] STM firmware update path in `spidemux` (where the firmware comes from, how it is flashed): never trigger it.
 - [ ] Units of the raw IMU, current and IR values; meaning of the two IR values and of the status bits.
 - [ ] Bits of the safeties value `0x3F00` (command `0x01`); meaning of commands `0x32`-`0x34`, and the polling rate.
 - [ ] Watchdog behaviour: does the STM stop the motors if no velocity command arrives for a while?

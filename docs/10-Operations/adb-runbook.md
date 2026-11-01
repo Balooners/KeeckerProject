@@ -1,7 +1,7 @@
 # ADB Runbook — Read-only Device Session
 
-**Status:** Ready, not yet run
-**Last update:** 2026-10-28
+**Status:** First run 2026-11-01 (results below)
+**Last update:** 2026-11-01
 
 ## Objective
 
@@ -71,7 +71,28 @@ EDL (Qualcomm 9008), partition dumps, toggling "OEM unlocking".
 | `flash.locked=1`, no unlock support, no switch | Locked, no official path | Study the Qualcomm EDL route (signed programmer for MSM8996) |
 | Empty values | Property not set by this firmware | Use `cmdline` (`androidboot.*` fields) and the other files |
 
+## Results of the first run (2026-11-01)
+
+Harold's robot over USB, `adb devices`: `product:keecker_k1_mb02 model:Keecker device:keecker_k1`. Capture
+`firmware/captures/2026-11-01_234644/` (ART-0012).
+
+| Question | Result | Confidence |
+|---|---|---|
+| Bootloader lock | `ro.boot.flash.locked=0`, `ro.boot.verifiedbootstate=green`, `ro.boot.veritymode=enforcing`, `ro.oem_unlock_supported` empty, `sys.oem_unlock_allowed=0`, `settings oem_unlock_allowed` = null | 🟡 The kernel was told "not locked" while verified boot is green: unusual pair, to confirm in fastboot (`fastboot oem device-info`, needs a reboot and Harold's approval) |
+| Build | `user`, `release-keys`, `ro.secure=1`, `ro.debuggable=0`, `ro.adb.secure=1`; fingerprint `Keecker/keecker_k1_mb02/keecker_k1:7.0/NRD90M/100140002:user/release-keys`, security patch 2018-01-05 | ✅ |
+| Root | No `su`; `adb shell` runs as `shell` | ✅ |
+| SoC and kernel | APQ8096 (soc_id 291), Linux 3.18.31 built 2019-03-04 | ✅ |
+| Partitions | UFS, six LUNs `sda`..`sdf` (`sda` ≈ 26 GB, its largest partition ≈ 22 GB mapped through `dm-0`, 🟡 probably encrypted userdata); partition **names** not readable without root (`by-name` and sysfs `uevent` denied) | ✅ sizes; names to get in fastboot or EDL |
+| STM | Six `@socket.stm.*` sockets served by `/system/bin/spidemux` (SPI); STM32F3 | ✅ ([stm32-protocol.md](../05-Interfaces/stm32-protocol.md)) |
+| Robot daemons | `spidemux`, `battery_reader`, `ihm_touch` (touch projection), `kcam_service`, `zcam_service`, `iop` | ✅ running |
+| Ports | TCP 5555, 6466, 6467 (Android TV remote), 8008, 8009 (Cast), 8080 (Keecker server), 8443, 9000, 10042, 32500; UDP 1900 (UPnP), 5353 (mDNS), 43045 (Keecker real-time) | ✅ |
+| DRM | `libwvdrmengine.so` present; `ro.com.google.gmsversion=7.0_r9` (Google-certified build) | ✅ present; Widevine level still unknown |
+
+Not readable as `shell`: `/proc/cmdline`, `/proc/device-tree`, `/data/misc/keecker/`, partition names, some
+`/system/bin` entries (`battery_reader`, `ihm_touch`, `iop`). `grep` on `/proc/net/unix` needs `-a`.
+
 ## Open Questions
 
-- [ ] First run of this procedure on the robot.
+- [x] First run of this procedure on the robot (2026-11-01).
+- [ ] Widevine security level (L1 or L3), for example with a DRM info app.
 - [ ] Fastboot reachability (`adb reboot bootloader`), in a later approved session.

@@ -1,6 +1,6 @@
 # Companion App ↔ Robot Protocol
 
-**Status:** In Progress (static analysis of the official app and of the robot server; not yet observed on the network)
+**Status:** In Progress (static analysis of the official app and of the robot server; discovery, handshake, pairing, encryption and projector control verified on a robot on 2026-11-01)
 **Last update:** 2026-10-28
 
 ## Objective
@@ -39,6 +39,21 @@ Artifact: robot side, `com.keecker.services` 1.14.6, Java classes recovered from
 
 Artifact: network scan of 2026-06-28 (`explorer/reports/NET-8080.json`, `explorer/raw/8080/`): port 8080 serves a page
 titled "Keecker File uploader", Jetty error pages, and static files whose `Last-Modified` date is the server start time.
+
+Live test, 2026-11-01, Harold's robot (services 1.14.6), with `scripts/remote-client/keecker_remote.py` from a Windows PC
+on the same Wi-Fi ([remote-client.md](../10-Operations/remote-client.md)):
+
+| Step | Observed | Confidence |
+|---|---|---|
+| `discover` | Service `Keecker._keecker._tcp.local.`, port **8080**, TXT `v=1014006`, `vn=1.14.6`, `uuid=<16 hex digits>` | ✅ |
+| First `status` (unknown key) | `ServiceVersionMessage` (1014006, 1.14.6, `forceUpgrade` false, `K1`, model version 0), then `AuthMessage` with `UNKNOWN_USER`; the robot says aloud that the device is not authorised and how to pair (6 presses) | ✅ |
+| 6 presses on the top button, then `status` | Accepted, session encrypted; `BatteryStatusMessage` pushed after `RegisterMessage`, `ProjectorStatusMessage` answered | ✅ |
+| `projector --led off`, then `--led on` | Status reports `ledOn` false, then true. A first 4-second test went unnoticed; with 10 seconds off, Harold saw the projected image go dark. `LedsMessage` switches the **projector light source** | ✅ |
+| `projector --tilt 30`, then `--tilt 7` | The projector head moved up, then back. Status: `orientation` 28 (then 12 while moving back, 7 at rest); automatic keystone follows (`keystone` −40 at 28°) | ✅ |
+| Second connection | Accepted without pairing (key remembered by the robot) | ✅ |
+
+The read-only snapshot of the same day also shows the listening sockets: TCP 8080, UDP 43045, and the local bridge
+socket `@com.keecker.services.remote.keecker.ws` in `/proc/net/unix`.
 
 ## Analysis
 
@@ -175,7 +190,9 @@ An open client needs four pieces, all now identified:
 This makes a new companion app possible for current robots, and keeps the same protocol available to the future Android TV build.
 
 A test client implementing all four pieces is in `scripts/remote-client/` ([remote-client.md](../10-Operations/remote-client.md)).
-It passes an offline test against a simulated robot; it has not yet run against a real robot.
+✅ On 2026-11-01 it paired with a real K1 through the official 6-press method, read battery and projector status,
+switched the projector light off and on, and tilted the projector: an open client can talk to existing robots
+without any Keecker server.
 
 ## Open Questions
 
@@ -184,6 +201,7 @@ It passes an offline test against a simulated robot; it has not yet run against 
 - [x] `AuthMessage` travels in clear inside a `KeeckerMessage`; the robot stores users and keys in its security database (see Handshake).
 - [x] Framing inside the binary WebSocket frames: one message per frame, no length prefix; `0xAA` keep-alive.
 - [x] Server side: Jetty `HttpServerService`, `WebsocketHandler` bridge, `WebSocketServer` and `RemoteCommunicationImp` in the remote service.
-- [ ] First live run of the test client (pairing, projector status, LED).
+- [x] First live run of the test client (pairing, projector status, LED): 2026-11-01, see Evidence.
+- [ ] Live test of the UDP channel (pointer, D-pad).
 - [x] Role of UDP port 43045: encrypted real-time pointer, D-pad and manual driving commands (see Real-time control over UDP).
 - [ ] Role of BLE (advertisement content) and of the Bluetooth RFCOMM link during setup.
